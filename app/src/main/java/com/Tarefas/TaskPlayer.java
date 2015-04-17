@@ -39,11 +39,13 @@ public class TaskPlayer implements Runnable {
     private Context context;
     private RegistrarLog registrarLog;
     private File arquivoVideo = null;
-    public static List<String> playlist = new ArrayList<String>();
+    public  List<String> playlist = new ArrayList<String>();
     private final String barraDoSistema = System.getProperty("file.separator");
     private final String caminho = Environment.getExternalStorageDirectory().toString();
     private boolean videoVazio = true;
     private int duracao = 60000;
+
+    public TaskPlayer(){}
 
     public TaskPlayer(MainActivity mainActivity, Handler handler, Context context) {
         this.main = mainActivity;
@@ -54,7 +56,8 @@ public class TaskPlayer implements Runnable {
 
     @Override
     public void run() {
-        //Log.e("Log", "Rodando a thread do player");
+        Log.e("Log", "Rodando a thread do player");
+        Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
         if (playlist == null || playlist.isEmpty()) {
             lerLinhas();
             if (videoVazio) {
@@ -64,40 +67,40 @@ public class TaskPlayer implements Runnable {
                 String linha = playlist.get(0);
                 String flag = linha.split("\\|")[0];
                 if(flag.equals("det") || flag.contains("det")){
-                    Log.e("Log","playlist = null AND comVideo AND Flag = Det");
+                    //Log.e("Log","playlist = null AND comVideo AND Flag = Det");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                 } else {
-                    Log.e("Log","playlist = null AND comVideo AND Flag = Normal");
+                    //Log.e("Log","playlist = null AND comVideo AND Flag = Normal");
                     boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                     if (retornoHorarioDaLinha) {
-                        Log.e("Log","playlist = null AND comVideo AND Flag = Normal AND HorarioProgramacao VALIDO");
+                        //Log.e("Log","playlist = null AND comVideo AND Flag = Normal AND HorarioProgramacao VALIDO");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(linha);
                     } else {
-                        Log.e("Log","playlist = null AND comVideo AND Flag = Normal AND HorarioProgramacao INVALIDO");
+                        //Log.e("Log","playlist = null AND comVideo AND Flag = Normal AND HorarioProgramacao INVALIDO");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(null);
                     }
                 }
             }
         } else {
-            Log.e("Log","playlist != null ");
+            //Log.e("Log","playlist != null ");
             String linha = playlist.get(0);
             String flag = linha.split("\\|")[0];
             if(flag.equals("det") || flag.contains("det")) {
-                Log.e("Log","playlist != null AND comVideo AND Flag = Det");
+                //Log.e("Log","playlist != null AND comVideo AND Flag = Det");
                 playlist = new ArrayList(playlist.subList(1, playlist.size()));
                 executar(linha);
             } else {
-                Log.e("Log","playlist != null AND comVideo AND Flag = Normal");
+                //Log.e("Log","playlist != null AND comVideo AND Flag = Normal");
                 boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                 if (retornoHorarioDaLinha) {
-                    Log.e("Log","playlist != null AND comVideo AND Flag = Normal AND HorarioProgramacao VALIDO");
+                    //Log.e("Log","playlist != null AND comVideo AND Flag = Normal AND HorarioProgramacao VALIDO");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                 } else {
-                    Log.e("Log","playlist != null AND comVideo AND Flag = Normal AND HorarioProgramacao INVALIDO");
+                    //Log.e("Log","playlist != null AND comVideo AND Flag = Normal AND HorarioProgramacao INVALIDO");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(null);
                 }
@@ -106,7 +109,6 @@ public class TaskPlayer implements Runnable {
     }
 
     private void lerLinhas() {
-        //Log.e("Log","Metodo lerLinhas");
         String caminhoPlaylist = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlist.exp");
         File arquivoPlaylist = new File(caminhoPlaylist);
 
@@ -124,7 +126,6 @@ public class TaskPlayer implements Runnable {
             try {
                 while (null != (line = bf.readLine())) {
                     if (line.contains("semVideo") || line.equals("semVideo")) {
-                        playlist.clear();
                         videoVazio = true;
                         break;
                     } else {
@@ -201,14 +202,12 @@ public class TaskPlayer implements Runnable {
     }
 
     private void executar(final String line) {
-        //Log.e("Log","Metodo executar");
         if (null == line) {
-            //Log.e("Log","VIDEO VAZIO");
             videoView = (VideoView) main.findViewById(R.id.video);
             videoView.destroyDrawingCache();
             videoView.setVisibility(View.INVISIBLE);
             videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-            playlist.clear();
+            //playlist.clear();
             handler.postDelayed(this, 1000);
         } else {
             Log.e("Log", "Video não é nulo, Playlist = " + playlist.size());
@@ -252,5 +251,13 @@ public class TaskPlayer implements Runnable {
             });
         }
         //Log.e("Log", "FIM DO METODO EXECUTAR");
+    }
+
+    public void setPlaylist(List<String> playlist) {
+        this.playlist = playlist;
+    }
+
+    public List<String> getPlaylist() {
+        return playlist;
     }
 }

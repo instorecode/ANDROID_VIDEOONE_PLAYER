@@ -1,5 +1,5 @@
-C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\classes\debug
-C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\debug\projetoUtils-b7804c1c3f84029bd924ddc5d5614be43f6a1daf.jar
-C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\debug\commons-lang3-3.3.2-952c2f763e3ac705fc3ba272689950cd2661ca1c.jar
-C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\debug\support-v4-18.0.0-4500bce4d5b0ca5fb106af3dd5615000a85091b3.jar
-C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\debug\sqlite-jdbc-3.8.7-34aa78e9b2981e65d03e83f7b4f6d07a263babfc.jar
+C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\build\intermediates\classes\debug
+C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\build\intermediates\pre-dexed\debug\projetoUtils-ac38f9abfdfc5cf9d2be588d9988fa4ae4784549.jar
+C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\build\intermediates\pre-dexed\debug\commons-lang3-3.3.2-a59be865f32c0a5edf2c0187fd4d6633c22412e5.jar
+C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\build\intermediates\pre-dexed\debug\support-v4-18.0.0-4500bce4d5b0ca5fb106af3dd5615000a85091b3.jar
+C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\build\intermediates\pre-dexed\debug\sqlite-jdbc-3.8.7-dde79c8a25bfb28c1bea7bc5f490fd986a6dbc4b.jar
