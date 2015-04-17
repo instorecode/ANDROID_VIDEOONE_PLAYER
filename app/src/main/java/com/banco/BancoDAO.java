@@ -26,7 +26,7 @@ import java.util.Random;
 import java.util.TimeZone;
 
 
-
+//sss
 public class BancoDAO {
     private static final String VIEW_PROGRAMACAO = "SELECT * FROM VIEW_CARREGAR_PROGRAMACAO";
     private List<ProgramacaoExp> listaProgramacao = new ArrayList<ProgramacaoExp>();
