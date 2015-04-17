@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\usuario\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-v4\18.0.0\support-v4-18.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
+        <dex dex="C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\release\support-v4-18.0.0-4500bce4d5b0ca5fb106af3dd5615000a85091b3.jar" />
+    </item>
+    <item
+        jar="C:\Users\usuario\AndroidstudioProjects\videoOne\app\libs\sqlite-jdbc-3.8.7.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="b50c89d50e9b9079fff5cd93e5d027d0a8b68aa6">
+        <dex dex="C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\release\sqlite-jdbc-3.8.7-34aa78e9b2981e65d03e83f7b4f6d07a263babfc.jar" />
+    </item>
+    <item
+        jar="C:\Users\usuario\AndroidstudioProjects\videoOne\app\libs\commons-lang3-3.3.2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="90a3822c38ec8c996e84c16a3477ef632cbc87a3">
+        <dex dex="C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\release\commons-lang3-3.3.2-952c2f763e3ac705fc3ba272689950cd2661ca1c.jar" />
+    </item>
+    <item
+        jar="C:\Users\usuario\AndroidstudioProjects\videoOne\app\libs\projetoUtils.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="1627c26e121a27d1c55933378d14f64f7561af44">
+        <dex dex="C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\debug\projetoUtils-b7804c1c3f84029bd924ddc5d5614be43f6a1daf.jar" />
+    </item>
+
+</items>

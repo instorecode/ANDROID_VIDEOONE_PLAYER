@@ -1,0 +1,5 @@
+C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\classes\release
+C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\release\projetoUtils-b7804c1c3f84029bd924ddc5d5614be43f6a1daf.jar
+C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\release\commons-lang3-3.3.2-952c2f763e3ac705fc3ba272689950cd2661ca1c.jar
+C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\release\support-v4-18.0.0-4500bce4d5b0ca5fb106af3dd5615000a85091b3.jar
+C:\Users\usuario\AndroidstudioProjects\videoOne\app\build\intermediates\pre-dexed\release\sqlite-jdbc-3.8.7-34aa78e9b2981e65d03e83f7b4f6d07a263babfc.jar
