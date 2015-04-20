@@ -656,7 +656,7 @@ public class BancoDAO {
         String duracaoDoVideo = df.format(new Date(tempoDoVideo));
         String data = data();
         String ultimaExecucao = ultimaExecucao();
-        int valorRandom = validarRandom();
+        int valorRandom = validarRandom(tipoCategoria);
         SQLiteDatabase db = helper.getWritableDatabase();
 
         String sql = "";
@@ -700,17 +700,24 @@ public class BancoDAO {
         return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
     }
 
-    private int validarRandom() {
+    private int validarRandom(String tipoCategoria) {
         SQLiteDatabase db = helper.getWritableDatabase();
         Random random = new Random();
         int valor = random.nextInt(9999);
 
-        String script = "SELECT Arquivo FROM Comercial where Random = " + valor + " LIMIT 1";
-        cursor = db.rawQuery(script, new String[]{});
+        String sql = "";
+        if (tipoCategoria.equals("1")) {
+            sql = "SELECT Arquivo FROM Video where Random = " + valor + " LIMIT 1";
+
+        } else {
+            sql = "SELECT Arquivo FROM Comercial where Random = " + valor + " LIMIT 1";
+        }
+
+        cursor = db.rawQuery(sql, new String[]{});
 
         while ((cursor.getCount() > 0)) {
             registrarLog.escrever(" 70 Ja existem o random " + valor);
-            validarRandom();
+            validarRandom(tipoCategoria);
         }
         return valor;
     }
