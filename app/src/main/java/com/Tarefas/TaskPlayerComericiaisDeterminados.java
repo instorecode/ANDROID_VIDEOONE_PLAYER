@@ -40,16 +40,12 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
 
     private List<String> playlistDeterminado = new ArrayList<String>();
     private List<String> comercialATocarAgora = new ArrayList<String>();
-
-    private List<String> listaAux = new ArrayList<String>();
     private final String barraDoSistema = System.getProperty("file.separator");
     private final String caminho = Environment.getExternalStorageDirectory().toString();
-
     private TaskPlayer taskPlayer;
 
-    private boolean semComercial = false;
 
-    public TaskPlayerComericiaisDeterminados (MainActivity mainActivity, Handler handler, Context context, TaskPlayer taskPlayer) {
+    public TaskPlayerComericiaisDeterminados(MainActivity mainActivity, Handler handler, Context context, TaskPlayer taskPlayer) {
         this.main = mainActivity;
         this.handler = handler;
         this.context = context;
@@ -59,28 +55,26 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
 
     @Override
     public void run() {
-        Log.e("Log","Rodando THREAD DETERMINADO");
+        Log.e("Log", "Rodando THREAD DETERMINADO");
         List<String> listaDeterminados = null;
         lerLinha();
         capturarVideoATOcar();
-        if(semComercial) {
-            listaDeterminados = validarSeOComercialInterrompe();
-        }
+        listaDeterminados = validarSeOComercialInterrompe();
 
-        if(listaDeterminados != null){
-            for(String linha : listaDeterminados){
-                if(!taskPlayer.getPlaylist().contains(linha)) {
+        if(listaDeterminados != null && !listaDeterminados.isEmpty()) {
+            for (String linha : listaDeterminados) {
+                if (!taskPlayer.getPlaylist().contains(linha)) {
                     taskPlayer.setPlaylist(listaDeterminados);
                 }
             }
         }
 
         Log.e("Log", "run TaskPlayerComericiaisDeterminados playlist SIZE = " + taskPlayer.getPlaylist().size());
-        handler.postDelayed(this,15000);
+        handler.postDelayed(this, 15000);
     }
 
     private List validarSeOComercialInterrompe() {
-        listaAux = new ArrayList<String>();
+        List<String> listaAux = new ArrayList<String>();
         if (comercialATocarAgora != null && !comercialATocarAgora.isEmpty()) {
             for (String comercial : comercialATocarAgora) {
                 String comercialInterrompe = comercial.split("\\|")[2];
@@ -89,56 +83,56 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
                         listaAux.add(comercial);
                     }
                 } else {
-                    videoView = (VideoView) main.findViewById(R.id.video);
-                    if (videoView.isPlaying()) {
+                    /* TODO
+                        Aqui é quando o determinado interrompe
+                     */
 
-                    }
+
                 }
             }
         }
-
         listaAux.addAll(taskPlayer.getPlaylist());
-        semComercial = false;
         return listaAux;
     }
 
-    private void capturarVideoATOcar () {
+    private void capturarVideoATOcar() {
         if (playlistDeterminado != null && !playlistDeterminado.isEmpty()) {
             for (String comercialDeterminado : playlistDeterminado) {
                 String horarioQueDeteTocar = comercialDeterminado.split("\\|")[1];
                 String horaAtual = new SimpleDateFormat("HH:mm").format(new Date());
                 if (horarioQueDeteTocar.equals(horaAtual) || horarioQueDeteTocar.contains(horaAtual)) {
-                    comercialATocarAgora.add(comercialDeterminado);
-                    semComercial = true;
+                    if(!comercialATocarAgora.contains(comercialDeterminado)){
+                        comercialATocarAgora.add(comercialDeterminado);
+                    }
                 }
             }
         }
         playlistDeterminado.clear();
     }
 
-    private void lerLinha(){
+    private void lerLinha() {
         String caminnhoPlaylistDet = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlistDet.exp");
         File arquivoPlaylistDet = new File(caminnhoPlaylistDet);
-        if(arquivoPlaylistDet.exists()){
+        if (arquivoPlaylistDet.exists()) {
             FileReader fileReader = null;
             try {
                 fileReader = new FileReader(arquivoPlaylistDet);
             } catch (FileNotFoundException e) {
-                ImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class,e);
+                ImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e);
             }
             BufferedReader bf = new BufferedReader(fileReader);
             String line = "";
             try {
-                while(null != (line = bf.readLine())){
-                    if(line.contains("semVideo") || line.equals("semVideo")){
-                       playlistDeterminado.clear();
+                while (null != (line = bf.readLine())) {
+                    if (line.contains("semVideo") || line.equals("semVideo")) {
+                        playlistDeterminado.clear();
                         break;
                     } else {
                         playlistDeterminado.add(line);
                     }
                 }
             } catch (IOException e) {
-                ImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class,e);
+                ImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e);
             } finally {
                 try {
                     bf.close();
