@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
         handlerNormal.post(taskPlayer);
 
         final Handler handlerDeterminados = new Handler();
-        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(this, handlerDeterminados, getApplicationContext(), taskPlayer));
+        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer));
 
     }
 

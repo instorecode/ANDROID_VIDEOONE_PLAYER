@@ -22,12 +22,8 @@ import java.util.List;
 
 public class TaskPlayerComericiaisDeterminados implements Runnable {
 
-    private MainActivity main;
-    private VideoView videoView;
+
     private Handler handler;
-    private BancoDAO bancoDAO;
-    private RegistrarLog registrarLog;
-    private Context context;
 
     private List<String> playlistDeterminado = new ArrayList<String>();
     private List<String> comercialATocarAgora = new ArrayList<String>();
@@ -37,12 +33,9 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
     private TaskPlayer taskPlayer;
 
 
-    public TaskPlayerComericiaisDeterminados(MainActivity mainActivity, Handler handler, Context context, TaskPlayer taskPlayer) {
-        this.main = mainActivity;
+    public TaskPlayerComericiaisDeterminados(Handler handler, TaskPlayer taskPlayer) {
         this.handler = handler;
-        this.context = context;
         this.taskPlayer = taskPlayer;
-        this.registrarLog = new RegistrarLog(context);
     }
 
     @Override

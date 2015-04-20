@@ -208,7 +208,7 @@ public class TaskPlayer implements Runnable {
             videoView.setVisibility(View.INVISIBLE);
             videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
             //playlist.clear();
-            handler.postDelayed(this, 1000);
+            handler.postDelayed(this, 60000);
         } else {
             Log.e("Log", "Video não é nulo, Playlist = " + playlist.size());
             final String video = line.split("\\|")[3];
