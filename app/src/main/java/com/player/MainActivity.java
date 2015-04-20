@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
         thread1.scheduleAtFixedRate(new TaskLerProperties(context), 0, 10, TimeUnit.SECONDS);
         thread2.scheduleAtFixedRate(new TaskDiretorios(), 500, 10000, TimeUnit.MILLISECONDS);
         thread3.scheduleAtFixedRate(new TaskCriarViewExcluirInvalidos(context), 600, 3600000, TimeUnit.MILLISECONDS);
-       // thread4.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 700, 30000, TimeUnit.MILLISECONDS);
+        thread4.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 700, 30000, TimeUnit.MILLISECONDS);
         thread5.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 700, 30000, TimeUnit.MILLISECONDS);
     }
 
@@ -49,12 +49,12 @@ public class MainActivity extends Activity {
         }
 
         final Handler handlerNormal = new Handler();
-        TaskPlayer taskPlayer = new TaskPlayer(this, handlerNormal,getApplicationContext());
+        TaskPlayer taskPlayer = new TaskPlayer(this, handlerNormal, getApplicationContext());
         //handlerNormal.post(new TaskPlayer(this, handlerNormal,getApplicationContext()));
         handlerNormal.post(taskPlayer);
 
         final Handler handlerDeterminados = new Handler();
-        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(this,handlerDeterminados, getApplicationContext(), taskPlayer));
+        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(this, handlerDeterminados, getApplicationContext(), taskPlayer));
 
     }
 
