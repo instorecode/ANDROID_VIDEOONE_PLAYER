@@ -253,8 +253,8 @@ public class TaskPlayer implements Runnable {
         //Log.e("Log", "FIM DO METODO EXECUTAR");
     }
 
-    public void setPlaylist(List<String> playlist) {
-        this.playlist = playlist;
+    public void setPlaylist(String line) {
+        this.playlist.add(line);
     }
 
     public List<String> getPlaylist() {
