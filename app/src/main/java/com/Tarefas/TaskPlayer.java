@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.banco.BancoDAO;
@@ -208,7 +209,7 @@ public class TaskPlayer implements Runnable {
             videoView.setVisibility(View.INVISIBLE);
             videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
             //playlist.clear();
-            handler.postDelayed(this, 60000);
+            handler.postDelayed(this, 2000);
         } else {
             Log.e("Log", "Video não é nulo, Playlist = " + playlist.size());
             final String video = line.split("\\|")[3];
@@ -229,6 +230,7 @@ public class TaskPlayer implements Runnable {
                 public void onPrepared(MediaPlayer mp) {
                     duracao = videoView.getDuration();
                     Log.e("Log", "Esta tocando o video " + arquivoVideo);
+                    Toast.makeText(context, arquivoVideo + "", Toast.LENGTH_LONG).show();
                     bancoDAO.atualizarBanco(arquivoVideo, duracao, tipoCategoria);
                     bancoDAO.close();
                     videoView.requestFocus();
