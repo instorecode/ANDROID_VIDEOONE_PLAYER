@@ -63,48 +63,45 @@ public class TaskPlayer implements Runnable {
         if (playlist == null || playlist.isEmpty()) {
             lerLinhas();
             if (videoVazio) {
-                //Log.e("Log","playlist = null AND semVideo");
                 executar(null);
+                return;
             } else {
                 String linha = playlist.get(0);
                 String flag = linha.split("\\|")[0];
                 if(flag.equals("det") || flag.contains("det")){
-                    //Log.e("Log","playlist = null AND comVideo AND Flag = Det");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
+                    return;
                 } else {
-                    //Log.e("Log","playlist = null AND comVideo AND Flag = Normal");
                     boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                     if (retornoHorarioDaLinha) {
-                        //Log.e("Log","playlist = null AND comVideo AND Flag = Normal AND HorarioProgramacao VALIDO");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(linha);
+                        return;
                     } else {
-                        //Log.e("Log","playlist = null AND comVideo AND Flag = Normal AND HorarioProgramacao INVALIDO");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(null);
+                        return;
                     }
                 }
             }
         } else {
-            //Log.e("Log","playlist != null ");
             String linha = playlist.get(0);
             String flag = linha.split("\\|")[0];
             if(flag.equals("det") || flag.contains("det")) {
-                //Log.e("Log","playlist != null AND comVideo AND Flag = Det");
                 playlist = new ArrayList(playlist.subList(1, playlist.size()));
                 executar(linha);
+                return;
             } else {
-                //Log.e("Log","playlist != null AND comVideo AND Flag = Normal");
                 boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                 if (retornoHorarioDaLinha) {
-                    //Log.e("Log","playlist != null AND comVideo AND Flag = Normal AND HorarioProgramacao VALIDO");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
+                    return;
                 } else {
-                    //Log.e("Log","playlist != null AND comVideo AND Flag = Normal AND HorarioProgramacao INVALIDO");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(null);
+                    return;
                 }
             }
         }
@@ -199,6 +196,12 @@ public class TaskPlayer implements Runnable {
     }
 
     private void executar(final String line) {
+        Log.e("Log","Executar");
+        if(determinadoAInterromper != null && !determinadoAInterromper.isEmpty()){
+            for(String linha : determinadoAInterromper){
+                Log.e("Log", linha + " Determinado a interromper");
+            }
+        }
         if (null == line) {
             videoView = (VideoView) main.findViewById(R.id.video);
             videoView.destroyDrawingCache();

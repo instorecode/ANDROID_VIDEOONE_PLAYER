@@ -48,33 +48,35 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
 
         if(listaValidarSeOComercialInterrompe != null && !listaValidarSeOComercialInterrompe.isEmpty()){
             for(String line : listaValidarSeOComercialInterrompe){
+                Log.e("Log", line + " linha Controlador");
                 taskPlayer.setDeterminadoAInterromper(line);
             }
             listaValidarSeOComercialInterrompe.clear();
         }
 
-
-
         if (listaValidarSeOComercialNaoInterrompe != null && !listaValidarSeOComercialNaoInterrompe.isEmpty()) {
             for (String line : listaValidarSeOComercialNaoInterrompe) {
+                Log.e("Log", line + " linha Controlador 2");
                 listaDeterminados.add(line);
             }
             listaValidarSeOComercialNaoInterrompe.clear();
         }
 
-        if (taskPlayer.getPlaylist() != null && !taskPlayer.getPlaylist().isEmpty()) {
+        /*if (taskPlayer.getPlaylist() != null && !taskPlayer.getPlaylist().isEmpty()) {
             for (String line : taskPlayer.getPlaylist()) {
+                Log.e("Log", line + " linha Controlador 3");
                 listaDeterminados.add(line);
             }
-        }
+        }*/
 
         if (listaDeterminados != null && !listaDeterminados.isEmpty()) {
             Log.e("Log", "run TaskPlayerComericiaisDeterminados listaDeterminados SIZE = " + listaDeterminados.size());
-            taskPlayer.getPlaylist().clear();
+            //taskPlayer.getPlaylist().clear();
             for (String line : listaDeterminados) {
-                if (!taskPlayer.getPlaylist().contains(line)) {
+                /*if (!taskPlayer.getPlaylist().contains(line)) {
+                    Log.e("Log", line + " linha Controlador 4");
                     taskPlayer.setPlaylist(line);
-                }
+                }*/
             }
             listaDeterminados.clear();
             handler.postDelayed(this, 60000);
@@ -91,14 +93,16 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
     private void validarSeOComercialInterrompe(List<String> listaDeComerciaisNoHorario) {
         if (listaDeComerciaisNoHorario != null && !listaDeComerciaisNoHorario.isEmpty()) {
             for (String comercial : listaDeComerciaisNoHorario) {
-                if (!listaValidarSeOComercialNaoInterrompe.contains(comercial)) {
-                    String comercialInterrompe = comercial.split("\\|")[2];
-                    if (comercialInterrompe.contains("0") || comercialInterrompe.equals("0")) {
-                        listaValidarSeOComercialNaoInterrompe.add(comercial);
-                    } else {
-                        listaValidarSeOComercialInterrompe.add(comercial);
-                    }
+                //if (!listaValidarSeOComercialNaoInterrompe.contains(comercial)) {
+                String comercialInterrompe = comercial.split("\\|")[2];
+                if (comercialInterrompe.contains("0") || comercialInterrompe.equals("0")) {
+                    Log.e("Log", comercial + " não interrompe");
+                    listaValidarSeOComercialNaoInterrompe.add(comercial);
+                } else {
+                    Log.e("Log", comercial + " interrompe");
+                    listaValidarSeOComercialInterrompe.add(comercial);
                 }
+                //}
             }
         }
         listaCapturarVideoATocar.clear();
