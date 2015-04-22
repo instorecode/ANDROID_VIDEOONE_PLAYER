@@ -251,7 +251,7 @@ public class BancoDAO {
         return false;
     }
 
-   /* private boolean validarDependenciasComercial(String arquivo, String titulo, String dependencia1, String dependencia2, String dependencia3, String horaInicial, String horaFinal, String codigoCategoria) {
+    private boolean validarDependenciasComercial(String arquivo, String titulo, String dependencia1, String dependencia2, String dependencia3, String horaInicial, String horaFinal, String codigoCategoria) {
          if (!dependencia1.trim().toLowerCase().equals("nenhuma")) {
             String resultado = validarExistenciaDoVideo(dependencia1);
             if (resultado == null) {
@@ -261,7 +261,7 @@ public class BancoDAO {
                 if (cd == null) {
                     registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
-                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + cd.getTituloDependencia() + "|" + cd.getCategoriaDependencia() + "|0|2");
+                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
             }
         }
@@ -275,7 +275,7 @@ public class BancoDAO {
                 if (cd == null) {
                     registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
-                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + cd.getTituloDependencia() + "|" + cd.getCategoriaDependencia() + "|0|2");
+                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
             }
         }
@@ -289,7 +289,7 @@ public class BancoDAO {
                 if (cd == null) {
                     registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
-                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + cd.getTituloDependencia() + "|" + cd.getCategoriaDependencia() + "|0|2");
+                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
             }
         }
@@ -303,9 +303,9 @@ public class BancoDAO {
         }
 
         return false;
-    }*/
+    }
 
-/*    private ComercialDependencia validarDependenciaNoBanco(String nome) {
+    private ComercialDependencia validarDependenciaNoBanco(String nome) {
         SQLiteDatabase db = helper.getWritableDatabase();
         String script = "SELECT * FROM VIEW_CARREGAR_COMERCIAL WHERE Arquivo = '" + nome + "'";
         cursor = db.rawQuery(script, new String[]{});
@@ -315,13 +315,13 @@ public class BancoDAO {
             String categoria = nuloToVazio(cursor.getString(cursor.getColumnIndex("Categoria")));
 
             ComercialDependencia cd = new ComercialDependencia();
-            cd.setNomeDependencia(arquivo);
-            cd.setTituloDependencia(titulo);
-            cd.setCategoriaDependencia(categoria);
+            cd.arquivo = arquivo;
+            cd.titulo = titulo;
+            cd.categoria = categoria;
             return cd;
         }
         return null;
-    }*/
+    }
 
     public void criarArquivoPlaylist(boolean vazio) {
         File playlistAntiga = new File(TaskDiretorios.diretorioPlaylist.concat("playlist.exp"));
