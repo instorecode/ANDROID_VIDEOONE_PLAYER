@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import com.Tarefas.TaskDiretorios;
 import com.bean.ComercialDependencia;
+import com.bean.ComercialDet;
 import com.br.instore.exp.bean.ComercialExp;
 import com.br.instore.exp.bean.ProgramacaoExp;
 import com.br.instore.utils.Banco;
@@ -28,7 +29,7 @@ public class BancoDAO {
     private static final String VIEW_PROGRAMACAO = "SELECT * FROM VIEW_CARREGAR_PROGRAMACAO";
     private List<ProgramacaoExp> listaProgramacao = new ArrayList<ProgramacaoExp>();
     private List<String> listaDeArquivos = new ArrayList<String>();
-    private List<ComercialExp> listaComercialDeterminados = new ArrayList<ComercialExp>();
+    private List<ComercialDet> listaComercialDeterminados = new ArrayList<ComercialDet>();
     private List<String> linhasPlaylistDet = new ArrayList<String>();
     private Banco banco = new Banco();
     private Cursor cursor;
@@ -250,7 +251,7 @@ public class BancoDAO {
         return false;
     }
 
-    private boolean validarDependenciasComercial(String arquivo, String titulo, String dependencia1, String dependencia2, String dependencia3, String horaInicial, String horaFinal, String codigoCategoria) {
+   /* private boolean validarDependenciasComercial(String arquivo, String titulo, String dependencia1, String dependencia2, String dependencia3, String horaInicial, String horaFinal, String codigoCategoria) {
          if (!dependencia1.trim().toLowerCase().equals("nenhuma")) {
             String resultado = validarExistenciaDoVideo(dependencia1);
             if (resultado == null) {
@@ -302,9 +303,9 @@ public class BancoDAO {
         }
 
         return false;
-    }
+    }*/
 
-    private ComercialDependencia validarDependenciaNoBanco(String nome) {
+/*    private ComercialDependencia validarDependenciaNoBanco(String nome) {
         SQLiteDatabase db = helper.getWritableDatabase();
         String script = "SELECT * FROM VIEW_CARREGAR_COMERCIAL WHERE Arquivo = '" + nome + "'";
         cursor = db.rawQuery(script, new String[]{});
@@ -320,7 +321,7 @@ public class BancoDAO {
             return cd;
         }
         return null;
-    }
+    }*/
 
     public void criarArquivoPlaylist(boolean vazio) {
         File playlistAntiga = new File(TaskDiretorios.diretorioPlaylist.concat("playlist.exp"));
@@ -382,121 +383,214 @@ public class BancoDAO {
         cursor = db.rawQuery(script, new String[]{});
 
         if (cursor.getCount() > 0) {
-            cursor.moveToFirst();
+            while (cursor.moveToNext()) {
+                ComercialDet comercialDet = new ComercialDet();
+                comercialDet.arquivo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
+                comercialDet.cliente = nuloToVazio(cursor.getString(cursor.getColumnIndex("Cliente")));
+                comercialDet.titulo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
+                comercialDet.categoria = cursor.getString(cursor.getColumnIndex("Categoria"));
+                comercialDet.dataInicial = nuloToVazio(cursor.getString(cursor.getColumnIndex("PeriodoInicial")));
+                comercialDet.dataFinal = nuloToVazio(cursor.getString(cursor.getColumnIndex("PeriodoFinal")));
+                comercialDet.horario1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario1")));
+                comercialDet.horario2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario2")));
+                comercialDet.horario3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario3")));
+                comercialDet.horario4 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario4")));
+                comercialDet.horario5 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario5")));
+                comercialDet.horario6 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario6")));
+                comercialDet.horario7 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario7")));
+                comercialDet.horario8 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario8")));
+                comercialDet.horario9 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario9")));
+                comercialDet.horario10 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario10")));
+                comercialDet.horario11 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario11")));
+                comercialDet.horario12 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario12")));
+                comercialDet.horario13 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario13")));
+                comercialDet.horario14 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario14")));
+                comercialDet.horario15 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario15")));
+                comercialDet.horario16 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario16")));
+                comercialDet.horario17 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario17")));
+                comercialDet.horario18 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario18")));
+                comercialDet.horario19 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario19")));
+                comercialDet.horario20 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario20")));
+                comercialDet.horario21 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario21")));
+                comercialDet.horario22 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario22")));
+                comercialDet.horario23 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario23")));
+                comercialDet.horario24 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario24")));
+                comercialDet.semana1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana1")));
+                comercialDet.semana2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
+                comercialDet.semana3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
+                comercialDet.semana4 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana4")));
+                comercialDet.semana5 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana5")));
+                comercialDet.semana6 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana6")));
+                comercialDet.semana7 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana7")));
+                comercialDet.semana8 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana8")));
+                comercialDet.semana9 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana9")));
+                comercialDet.semana10 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana10")));
+                comercialDet.semana11 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana11")));
+                comercialDet.semana12 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana12")));
+                comercialDet.semana13 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana13")));
+                comercialDet.semana14 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana14")));
+                comercialDet.semana15 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana15")));
+                comercialDet.semana16 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana16")));
+                comercialDet.semana17 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana17")));
+                comercialDet.semana18 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana18")));
+                comercialDet.semana19 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana19")));
+                comercialDet.semana20 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana20")));
+                comercialDet.semana21 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana21")));
+                comercialDet.semana22 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana22")));
+                comercialDet.semana23 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana23")));
+                comercialDet.semana24 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana24")));
+                comercialDet.diaSemana = nuloToVazio(cursor.getString(cursor.getColumnIndex("DiaSemana")));
+                comercialDet.diasAlternados = (cursor.getString(cursor.getColumnIndex("DiasAlternados")) == "1") ? true : false;
+                comercialDet.data = nuloToVazio(cursor.getString(cursor.getColumnIndex("Data")));
+                comercialDet.ultimaExecucao = nuloToVazio(cursor.getString(cursor.getColumnIndex("UltimaExecucao")));
+                comercialDet.tempoTotal = nuloToVazio(cursor.getString(cursor.getColumnIndex("TempoTotal")));
+                comercialDet.random = cursor.getInt(cursor.getColumnIndex("Random"));
+                comercialDet.qtdePlayer = cursor.getInt(cursor.getColumnIndex("QtdePlayer"));
+                comercialDet.qtdePlayer = cursor.getInt(cursor.getColumnIndex("Qtde"));
+                comercialDet.dataVencimento = nuloToVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
+                comercialDet.dependencia1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
+                comercialDet.dependencia2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
+                comercialDet.dependencia3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
 
-            do {
-                ComercialExp comercialExp = new ComercialExp();
-                comercialExp.arquivo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
-                comercialExp.cliente = nuloToVazio(cursor.getString(cursor.getColumnIndex("Cliente")));
-                comercialExp.titulo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                comercialExp.tipoInterprete = cursor.getInt(cursor.getColumnIndex("TipoInterprete"));
-                comercialExp.categoria = cursor.getInt(cursor.getColumnIndex("Categoria"));
-                comercialExp.dataInicial = nuloToVazio(cursor.getString(cursor.getColumnIndex("PeriodoInicial")));
-                comercialExp.dataFinal = nuloToVazio(cursor.getString(cursor.getColumnIndex("PeriodoFinal")));
-                comercialExp.tipoHorario = cursor.getInt(cursor.getColumnIndex("TipoHorario"));
-                comercialExp.horario1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario1")));
-                comercialExp.horario2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario2")));
-                comercialExp.horario3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario3")));
-                comercialExp.horario4 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario4")));
-                comercialExp.horario5 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario5")));
-                comercialExp.horario6 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario6")));
-                comercialExp.horario7 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario7")));
-                comercialExp.horario8 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario8")));
-                comercialExp.horario9 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario9")));
-                comercialExp.horario10 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario10")));
-                comercialExp.horario11 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario11")));
-                comercialExp.horario12 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario12")));
-                comercialExp.horario13 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario13")));
-                comercialExp.horario14 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario14")));
-                comercialExp.horario15 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario15")));
-                comercialExp.horario16 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario16")));
-                comercialExp.horario17 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario17")));
-                comercialExp.horario18 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario18")));
-                comercialExp.horario19 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario19")));
-                comercialExp.horario20 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario20")));
-                comercialExp.horario21 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario21")));
-                comercialExp.horario22 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario22")));
-                comercialExp.horario23 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario23")));
-                comercialExp.horario24 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario24")));
-                comercialExp.semana1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana1")));
-                comercialExp.semana2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
-                comercialExp.semana3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
-                comercialExp.semana4 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana4")));
-                comercialExp.semana5 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana5")));
-                comercialExp.semana6 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana6")));
-                comercialExp.semana7 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana7")));
-                comercialExp.semana8 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana8")));
-                comercialExp.semana9 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana9")));
-                comercialExp.semana10 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana10")));
-                comercialExp.semana11 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana11")));
-                comercialExp.semana12 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana12")));
-                comercialExp.semana13 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana13")));
-                comercialExp.semana14 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana14")));
-                comercialExp.semana15 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana15")));
-                comercialExp.semana16 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana16")));
-                comercialExp.semana17 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana17")));
-                comercialExp.semana18 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana18")));
-                comercialExp.semana19 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana19")));
-                comercialExp.semana20 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana20")));
-                comercialExp.semana21 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana21")));
-                comercialExp.semana22 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana22")));
-                comercialExp.semana23 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana23")));
-                comercialExp.semana24 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana24")));
-                comercialExp.diaSemana = nuloToVazio(cursor.getString(cursor.getColumnIndex("DiaSemana")));
-                comercialExp.diasAlternados = (cursor.getString(cursor.getColumnIndex("DiasAlternados")) == "1") ? true : false;
-                comercialExp.data = nuloToVazio(cursor.getString(cursor.getColumnIndex("Data")));
-                comercialExp.ultimaExecucao = nuloToVazio(cursor.getString(cursor.getColumnIndex("UltimaExecucao")));
-                comercialExp.tempoTotal = nuloToVazio(cursor.getString(cursor.getColumnIndex("TempoTotal")));
-                comercialExp.random = cursor.getInt(cursor.getColumnIndex("Random"));
-                comercialExp.qtdePlayer = cursor.getInt(cursor.getColumnIndex("QtdePlayer"));
-                comercialExp.qtdePlayer = cursor.getInt(cursor.getColumnIndex("Qtde"));
-                comercialExp.dataVencimento = nuloToVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
-                comercialExp.dependencia1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
-                comercialExp.dependencia2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
-                comercialExp.dependencia3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
-
-                listaComercialDeterminados.add(comercialExp);
-            } while (cursor.moveToNext());
+                listaComercialDeterminados.add(comercialDet);
+            }
         }
     }
 
-    public void horariosComercialDeterminado() {
+    public void controladorComercialDependencia () {
         if (null != listaComercialDeterminados && listaComercialDeterminados.size() > 0 && !listaComercialDeterminados.isEmpty()) {
-            for (ComercialExp comercialExp : listaComercialDeterminados) {
-                String arquivo = validarExistenciaDoVideo(comercialExp.arquivo);
-                if (null != arquivo) {
-                    semanaAndHorario(comercialExp.semana1, comercialExp.horario1, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana2, comercialExp.horario2, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana3, comercialExp.horario3, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana4, comercialExp.horario4, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana5, comercialExp.horario5, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana6, comercialExp.horario6, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana7, comercialExp.horario7, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana8, comercialExp.horario8, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana9, comercialExp.horario9, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana10, comercialExp.horario10, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana11, comercialExp.horario11, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana12, comercialExp.horario12, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana13, comercialExp.horario13, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana14, comercialExp.horario14, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana15, comercialExp.horario15, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana16, comercialExp.horario16, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana17, comercialExp.horario17, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana18, comercialExp.horario18, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana19, comercialExp.horario19, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana20, comercialExp.horario20, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana21, comercialExp.horario21, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana22, comercialExp.horario22, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana23, comercialExp.horario23, arquivo, comercialExp.titulo, comercialExp.categoria);
-                    semanaAndHorario(comercialExp.semana24, comercialExp.horario24, arquivo, comercialExp.titulo, comercialExp.categoria);
-                } else {
-                    registrarLog.escrever(" 99 Desprezada com tipo. O arquivo " + comercialExp.arquivo + " não foi encontrada em nenhum diretório");
+            for (ComercialDet comercialDet : listaComercialDeterminados) {
+                ComercialDet comercialDetComDepencias = dependenciaDeterminados(comercialDet);
+                if (null != comercialDetComDepencias) {
+                    semanaAndHorario(comercialDet.semana1, comercialDet.horario1, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana2, comercialDet.horario2, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana3, comercialDet.horario3, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana4, comercialDet.horario4, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana5, comercialDet.horario5, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana6, comercialDet.horario6, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana7, comercialDet.horario7, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana8, comercialDet.horario8, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana9, comercialDet.horario9, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana10, comercialDet.horario10, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana11, comercialDet.horario11, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana12, comercialDet.horario12, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana13, comercialDet.horario13, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana14, comercialDet.horario14, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana15, comercialDet.horario15, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana16, comercialDet.horario16, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana17, comercialDet.horario17, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana18, comercialDet.horario18, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana19, comercialDet.horario19, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana20, comercialDet.horario20, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana21, comercialDet.horario21, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana22, comercialDet.horario22, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana23, comercialDet.horario23, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana24, comercialDet.horario24, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
                 }
             }
         }
     }
 
-    private void semanaAndHorario(String semana, String horario, String arquivo, String titulo, int categoria) {
+    private ComercialDet dependenciaDeterminados(ComercialDet comercialDet) {
+        String nomeComercial = comercialDet.arquivo;
+        String dependencia1 = comercialDet.dependencia1;
+        String dependencia2 = comercialDet.dependencia2;
+        String dependencia3 = comercialDet.dependencia3;
+
+        String arquivoComercialDetermidado = validarExistenciaDoVideo(nomeComercial);
+        if (null != arquivoComercialDetermidado) {
+            comercialDet.arquivo = arquivoComercialDetermidado;
+            ///-----------------------DEPENDENCOA 1 ---------------------------------------------------------------///
+            String resultadoDependencia1 = validarExistenciaDoVideo(dependencia1);
+            if (null != resultadoDependencia1) {
+                ComercialDependencia resultadoExisteNoBanco = validarDependenciaDeUmDeterminadoNoBanco(dependencia1);
+                if (null != resultadoExisteNoBanco) {
+                    resultadoExisteNoBanco.arquivo = resultadoDependencia1;
+                    comercialDet.listaDependencias.add(resultadoExisteNoBanco);
+                } else {
+               /*TODO
+                    Colocar a mensagem de desprezada no banco tipo 99
+                */
+                }
+            } else {
+               /*TODO
+                    Colocar a mensagem de desprezada no diretorio tipo 99
+                */
+            }
+
+            ///-----------------------DEPENDENCOA 2 ---------------------------------------------------------------///
+            String resultadoDependencia2 = validarExistenciaDoVideo(dependencia2);
+            if (null != resultadoDependencia2) {
+                ComercialDependencia resultadoExisteNoBanco = validarDependenciaDeUmDeterminadoNoBanco(dependencia2);
+                if (null != resultadoExisteNoBanco) {
+                    resultadoExisteNoBanco.arquivo = resultadoDependencia2;
+                    comercialDet.listaDependencias.add(resultadoExisteNoBanco);
+                } else {
+                /*TODO
+                    Colocar a mensagem de desprezada no banco tipo 99
+                */
+                }
+            } else {
+            /*TODO
+                Colocar a mensagem de desprezada no diretorio tipo 99
+             */
+            }
+
+            ///-----------------------DEPENDENCOA 3 ---------------------------------------------------------------///
+            String resultadoDependencia3 = validarExistenciaDoVideo(dependencia3);
+            if (null != resultadoDependencia3) {
+                ComercialDependencia resultadoExisteNoBanco = validarDependenciaDeUmDeterminadoNoBanco(dependencia3);
+                if (null != resultadoExisteNoBanco) {
+                    resultadoExisteNoBanco.arquivo = resultadoDependencia3;
+                    comercialDet.listaDependencias.add(resultadoExisteNoBanco);
+                } else {
+                /*TODO
+                    Colocar a mensagem de desprezada no banco tipo 99
+                 */
+                }
+            } else {
+                /*TODO
+                    Colocar a mensagem de desprezada no diretorio tipo 99
+                 */
+            }
+        } else {
+            /*TODO
+                Colocar a mensagem de desprezada no diretorio tipo 99
+             */
+            return null;
+        }
+        return comercialDet;
+    }
+
+    private ComercialDependencia validarDependenciaDeUmDeterminadoNoBanco(String nome){
+        SQLiteDatabase db = helper.getWritableDatabase();
+        String sql = "SELECT * FROM VIEW_CARREGAR_COMERCIAL WHERE (QtdePlayer is null OR QtdePlayer > Qtde) AND Arquivo = '" + nome + "';";
+        Cursor cursorDependencia = db.rawQuery(sql , new String[]{});
+        if (cursorDependencia.getCount() > 0) {
+            ComercialDependencia comercialDependencia = new ComercialDependencia();
+            while (cursorDependencia.moveToNext()) {
+                comercialDependencia.arquivo = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Arquivo")));
+                comercialDependencia.cliente = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Cliente")));
+                comercialDependencia.categoria = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Categoria")));
+                comercialDependencia.data = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Data")));
+                comercialDependencia.dataInicial = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("PeriodoInicial")));
+                comercialDependencia.dataFinal = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("PeriodoFinal")));
+                comercialDependencia.dataVencimento = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("DataVencto")));
+                comercialDependencia.titulo = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Titulo")));
+            }
+            return comercialDependencia;
+        }
+        cursorDependencia.close();
+        return null;
+    }
+
+    private void semanaAndHorario(String semana, String horario, String arquivo, String titulo, String categoria, List<ComercialDependencia> listaDependenciasComercialDeterminado) {
+        if(null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()){
+            for(ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado){
+                String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "1|" + "0|" + arquivo + titulo + "|" + categoria + "|1|2";
+                linhasPlaylistDet.add(linha);
+            }
+        }
         if (semana.equals("1") || semana.equals("0")) {
             linhasPlaylistDet.add("det|" + horario + "|" + semana + "|" + arquivo + "|" + titulo + "|" + categoria + "|1|2");
         }
