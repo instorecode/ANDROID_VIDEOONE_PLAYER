@@ -46,44 +46,46 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
         capturarVideoATocar(listaLerLinha);
         validarSeOComercialInterrompe(listaCapturarVideoATocar);
 
-        if(listaValidarSeOComercialInterrompe != null && !listaValidarSeOComercialInterrompe.isEmpty()){
-            for(String line : listaValidarSeOComercialInterrompe){
-                Log.e("Log", line + " linha Controlador");
+        if (listaValidarSeOComercialInterrompe != null && !listaValidarSeOComercialInterrompe.isEmpty()) {
+            for (String line : listaValidarSeOComercialInterrompe) {
                 taskPlayer.setDeterminadoAInterromper(line);
             }
-            listaValidarSeOComercialInterrompe.clear();
         }
 
         if (listaValidarSeOComercialNaoInterrompe != null && !listaValidarSeOComercialNaoInterrompe.isEmpty()) {
             for (String line : listaValidarSeOComercialNaoInterrompe) {
-                Log.e("Log", line + " linha Controlador 2");
                 listaDeterminados.add(line);
             }
             listaValidarSeOComercialNaoInterrompe.clear();
         }
 
-        /*if (taskPlayer.getPlaylist() != null && !taskPlayer.getPlaylist().isEmpty()) {
+        if (taskPlayer.getPlaylist() != null && !taskPlayer.getPlaylist().isEmpty()) {
             for (String line : taskPlayer.getPlaylist()) {
-                Log.e("Log", line + " linha Controlador 3");
                 listaDeterminados.add(line);
             }
-        }*/
-
-        if (listaDeterminados != null && !listaDeterminados.isEmpty()) {
-            Log.e("Log", "run TaskPlayerComericiaisDeterminados listaDeterminados SIZE = " + listaDeterminados.size());
-            //taskPlayer.getPlaylist().clear();
-            for (String line : listaDeterminados) {
-                /*if (!taskPlayer.getPlaylist().contains(line)) {
-                    Log.e("Log", line + " linha Controlador 4");
-                    taskPlayer.setPlaylist(line);
-                }*/
-            }
-            listaDeterminados.clear();
-            handler.postDelayed(this, 60000);
-        } else {
-            handler.postDelayed(this, 10000);
         }
 
+        if (listaDeterminados != null && !listaDeterminados.isEmpty()) {
+            taskPlayer.getPlaylist().clear();
+            for (String line : listaDeterminados) {
+                if (!taskPlayer.getPlaylist().contains(line)) {
+                    taskPlayer.setPlaylist(line);
+                }
+            }
+            listaDeterminados.clear();
+            Log.e("Log", "um minuto 1");
+            handler.postDelayed(this, 60000);
+        } else {
+            if (listaValidarSeOComercialInterrompe != null && !listaValidarSeOComercialInterrompe.isEmpty()) {
+                Log.e("Log", "um minuto 2");
+                handler.postDelayed(this, 60000);
+            } else {
+                Log.e("Log", "10 segundos");
+                handler.postDelayed(this, 10000);
+            }
+        }
+
+        listaValidarSeOComercialInterrompe.clear();
         if (null != taskPlayer.getPlaylist() && !taskPlayer.getPlaylist().isEmpty()) {
             Log.e("Log", "run TaskPlayerComericiaisDeterminados playlist SIZE = " + taskPlayer.getPlaylist().size());
         }
@@ -93,16 +95,18 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
     private void validarSeOComercialInterrompe(List<String> listaDeComerciaisNoHorario) {
         if (listaDeComerciaisNoHorario != null && !listaDeComerciaisNoHorario.isEmpty()) {
             for (String comercial : listaDeComerciaisNoHorario) {
-                //if (!listaValidarSeOComercialNaoInterrompe.contains(comercial)) {
+
                 String comercialInterrompe = comercial.split("\\|")[2];
-                if (comercialInterrompe.contains("0") || comercialInterrompe.equals("0")) {
-                    Log.e("Log", comercial + " não interrompe");
-                    listaValidarSeOComercialNaoInterrompe.add(comercial);
-                } else {
-                    Log.e("Log", comercial + " interrompe");
-                    listaValidarSeOComercialInterrompe.add(comercial);
-                }
-                //}
+                String flag = comercial.split("\\|")[0];
+
+                    if (comercialInterrompe.contains("0") || comercialInterrompe.equals("0")) {
+                        Log.e("Log", comercial + " não interrompe");
+                        listaValidarSeOComercialNaoInterrompe.add(comercial);
+                    } else {
+                        Log.e("Log", comercial + " interrompe");
+                        listaValidarSeOComercialInterrompe.add(comercial);
+                    }
+
             }
         }
         listaCapturarVideoATocar.clear();

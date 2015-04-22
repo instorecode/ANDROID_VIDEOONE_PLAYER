@@ -61,24 +61,31 @@ public class TaskPlayer implements Runnable {
         Log.e("Log", "Rodando a thread do player");
         Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
         if (playlist == null || playlist.isEmpty()) {
+            Log.e("Log","1");
             lerLinhas();
             if (videoVazio) {
+                Log.e("Log","2");
                 executar(null);
                 return;
             } else {
+                Log.e("Log","3");
                 String linha = playlist.get(0);
                 String flag = linha.split("\\|")[0];
                 if(flag.equals("det") || flag.contains("det")){
+                    Log.e("Log","4");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                     return;
                 } else {
+                    Log.e("Log","5");
                     boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                     if (retornoHorarioDaLinha) {
+                        Log.e("Log","6");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(linha);
                         return;
                     } else {
+                        Log.e("Log","7");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(null);
                         return;
@@ -86,19 +93,24 @@ public class TaskPlayer implements Runnable {
                 }
             }
         } else {
+            Log.e("Log","8");
             String linha = playlist.get(0);
             String flag = linha.split("\\|")[0];
             if(flag.equals("det") || flag.contains("det")) {
+                Log.e("Log","9");
                 playlist = new ArrayList(playlist.subList(1, playlist.size()));
                 executar(linha);
                 return;
             } else {
+                Log.e("Log","10");
                 boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                 if (retornoHorarioDaLinha) {
+                    Log.e("Log","11");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                     return;
                 } else {
+                    Log.e("Log","12");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(null);
                     return;
@@ -195,13 +207,16 @@ public class TaskPlayer implements Runnable {
         return true;
     }
 
-    private void executar(final String line) {
+    private void executar(String line) {
         Log.e("Log","Executar");
         if(determinadoAInterromper != null && !determinadoAInterromper.isEmpty()){
+            line = determinadoAInterromper.get(0);
             for(String linha : determinadoAInterromper){
                 Log.e("Log", linha + " Determinado a interromper");
             }
+            determinadoAInterromper = determinadoAInterromper.subList(1,determinadoAInterromper.size());
         }
+
         if (null == line) {
             videoView = (VideoView) main.findViewById(R.id.video);
             videoView.destroyDrawingCache();
@@ -233,8 +248,8 @@ public class TaskPlayer implements Runnable {
                     bancoDAO.close();
                     videoView.requestFocus();
                     videoView.start();
-                    String flag = line.split("\\|")[0];
-                    /*if(!flag.equals("det") || !flag.contains("det")) {
+                    /*String flag = line.split("\\|")[0];
+                    if(!flag.equals("det") || !flag.contains("det")) {
                        new TaskVideoAndComerciais(context);
                     }*/
                 }
@@ -261,7 +276,7 @@ public class TaskPlayer implements Runnable {
     }
 
     public void setDeterminadoAInterromper(String line){
-        this.playlist.add(line);
+        this.determinadoAInterromper.add(line);
     }
 
     public List<String> getDeterminadoAInterromper(){
