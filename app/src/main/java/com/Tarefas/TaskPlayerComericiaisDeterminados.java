@@ -1,15 +1,10 @@
 package com.Tarefas;
 
-import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.VideoView;
-import com.banco.BancoDAO;
 import com.br.instore.utils.ConfiguaracaoUtils;
 import com.br.instore.utils.ImprimirUtils;
-import com.player.MainActivity;
-import com.utils.RegistrarLog;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,9 +20,10 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
 
     private Handler handler;
 
-    private List<String> playlistDeterminado = new ArrayList<String>();
-    private List<String> comercialATocarAgora = new ArrayList<String>();
-    private List<String> listaAux = new ArrayList<String>();
+    private List<String> listaLerLinha = new ArrayList<String>();
+    private List<String> listaCapturarVideoATocar = new ArrayList<String>();
+    private List<String> listaValidarSeOComercialNaoInterrompe = new ArrayList<String>();
+    private List<String> listaValidarSeOComercialInterrompe = new ArrayList<String>();
     private final String barraDoSistema = System.getProperty("file.separator");
     private final String caminho = Environment.getExternalStorageDirectory().toString();
     private TaskPlayer taskPlayer;
@@ -47,18 +43,27 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
     private void controlador() {
         List<String> listaDeterminados = new ArrayList<String>();
         lerLinha();
-        capturarVideoATOcar(playlistDeterminado);
-        validarSeOComercialInterrompe(comercialATocarAgora);
+        capturarVideoATocar(listaLerLinha);
+        validarSeOComercialInterrompe(listaCapturarVideoATocar);
 
-        if (listaAux != null && !listaAux.isEmpty()) {
-            for(String line : listaAux){
-                listaDeterminados.add(line);
+        if(listaValidarSeOComercialInterrompe != null && !listaValidarSeOComercialInterrompe.isEmpty()){
+            for(String line : listaValidarSeOComercialInterrompe){
+                taskPlayer.setDeterminadoAInterromper(line);
             }
-            listaAux.clear();
+            listaValidarSeOComercialInterrompe.clear();
         }
 
-        if(taskPlayer.getPlaylist() != null && !taskPlayer.getPlaylist().isEmpty()){
-            for(String line: taskPlayer.getPlaylist()){
+
+
+        if (listaValidarSeOComercialNaoInterrompe != null && !listaValidarSeOComercialNaoInterrompe.isEmpty()) {
+            for (String line : listaValidarSeOComercialNaoInterrompe) {
+                listaDeterminados.add(line);
+            }
+            listaValidarSeOComercialNaoInterrompe.clear();
+        }
+
+        if (taskPlayer.getPlaylist() != null && !taskPlayer.getPlaylist().isEmpty()) {
+            for (String line : taskPlayer.getPlaylist()) {
                 listaDeterminados.add(line);
             }
         }
@@ -86,29 +91,27 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
     private void validarSeOComercialInterrompe(List<String> listaDeComerciaisNoHorario) {
         if (listaDeComerciaisNoHorario != null && !listaDeComerciaisNoHorario.isEmpty()) {
             for (String comercial : listaDeComerciaisNoHorario) {
-                if (!listaAux.contains(comercial)) {
+                if (!listaValidarSeOComercialNaoInterrompe.contains(comercial)) {
                     String comercialInterrompe = comercial.split("\\|")[2];
                     if (comercialInterrompe.contains("0") || comercialInterrompe.equals("0")) {
-                        listaAux.add(comercial);
+                        listaValidarSeOComercialNaoInterrompe.add(comercial);
                     } else {
-                    /* TODO
-                        Aqui é quando o determinado interrompe
-                     */
+                        listaValidarSeOComercialInterrompe.add(comercial);
                     }
                 }
             }
         }
-        comercialATocarAgora.clear();
+        listaCapturarVideoATocar.clear();
     }
 
-    private void capturarVideoATOcar(List<String> listaDeLinhas) {
+    private void capturarVideoATocar(List<String> listaDeLinhas) {
         if (listaDeLinhas != null && !listaDeLinhas.isEmpty()) {
             for (String comercialDeterminado : listaDeLinhas) {
                 String horarioQueDeteTocar = comercialDeterminado.split("\\|")[1];
                 String horaAtual = new SimpleDateFormat("HH:mm").format(new Date());
                 if (horarioQueDeteTocar.equals(horaAtual) || horarioQueDeteTocar.contains(horaAtual)) {
-                    if (!comercialATocarAgora.contains(comercialDeterminado)) {
-                        comercialATocarAgora.add(comercialDeterminado);
+                    if (!listaCapturarVideoATocar.contains(comercialDeterminado)) {
+                        listaCapturarVideoATocar.add(comercialDeterminado);
                     }
                 }
             }
@@ -131,10 +134,10 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
             try {
                 while (null != (line = bf.readLine())) {
                     if (line.contains("semVideo") || line.equals("semVideo")) {
-                        playlistDeterminado.clear();
+                        listaLerLinha.clear();
                         break;
                     } else {
-                        playlistDeterminado.add(line);
+                        listaLerLinha.add(line);
                     }
                 }
             } catch (IOException e) {

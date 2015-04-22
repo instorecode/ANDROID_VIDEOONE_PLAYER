@@ -33,6 +33,7 @@ import java.util.TimeZone;
 
 public class TaskPlayer implements Runnable {
 
+    public List<String> determinadoAInterromper = new ArrayList<String>();
     private MainActivity main;
     private Handler handler;
     private VideoView videoView;
@@ -112,16 +113,13 @@ public class TaskPlayer implements Runnable {
     private void lerLinhas() {
         String caminhoPlaylist = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlist.exp");
         File arquivoPlaylist = new File(caminhoPlaylist);
-
-        if(arquivoPlaylist.exists()) {
+        if (arquivoPlaylist.exists()) {
             FileReader fileReader = null;
-
             try {
                 fileReader = new FileReader(arquivoPlaylist);
             } catch (FileNotFoundException e) {
                 ImprimirUtils.imprimirErro(TaskPlayer.this, e);
             }
-
             BufferedReader bf = new BufferedReader(fileReader);
             String line = "";
             try {
@@ -136,47 +134,47 @@ public class TaskPlayer implements Runnable {
                 }
             } catch (IOException e) {
                 ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
             } finally {
                 try {
                     bf.close();
                 } catch (IOException e) {
                     ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    return;
                 }
-
                 try {
                     fileReader.close();
                 } catch (IOException e) {
                     ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    return;
                 }
             }
         } else {
-
             try {
                 arquivoPlaylist.createNewFile();
             } catch (IOException e) {
                 ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
             }
-
             FileWriter fileWriter = null;
-
             try {
                 fileWriter = new FileWriter(arquivoPlaylist, true);
             } catch (IOException e) {
                 ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
             }
-
             try {
                 fileWriter.write("semVideo");
             } catch (IOException e) {
                 ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
             }
-
             try {
                 fileWriter.close();
             } catch (IOException e) {
                 ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
             }
-
         }
     }
 
@@ -184,18 +182,16 @@ public class TaskPlayer implements Runnable {
         Date horaInicialProgramação = null;
         Date horaFinalProgramacao = null;
         String dataAtual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-
         try {
             horaInicialProgramação = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss").parse(dataAtual.concat(horaInicial));
             horaFinalProgramacao = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss").parse(dataAtual.concat(horaFinal));
         } catch (ParseException e) {
             ImprimirUtils.imprimirErro(ConfiguaracaoUtils.class, e);
+            return false;
         }
-
         if (horaFinalProgramacao.before(new Date())) {
             return false;
         }
-
         if (horaInicialProgramação.after(new Date())) {
             return false;
         }
@@ -208,7 +204,6 @@ public class TaskPlayer implements Runnable {
             videoView.destroyDrawingCache();
             videoView.setVisibility(View.INVISIBLE);
             videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-            //playlist.clear();
             handler.postDelayed(this, 2000);
         } else {
             Log.e("Log", "Video não é nulo, Playlist = " + playlist.size());
@@ -236,9 +231,9 @@ public class TaskPlayer implements Runnable {
                     videoView.requestFocus();
                     videoView.start();
                     String flag = line.split("\\|")[0];
-                    if(!flag.equals("det") || !flag.contains("det")) {
+                    /*if(!flag.equals("det") || !flag.contains("det")) {
                        new TaskVideoAndComerciais(context);
-                    }
+                    }*/
                 }
             });
 
@@ -252,7 +247,6 @@ public class TaskPlayer implements Runnable {
                 }
             });
         }
-        //Log.e("Log", "FIM DO METODO EXECUTAR");
     }
 
     public void setPlaylist(String line) {
@@ -262,4 +256,14 @@ public class TaskPlayer implements Runnable {
     public List<String> getPlaylist() {
         return playlist;
     }
+
+    public void setDeterminadoAInterromper(String line){
+        this.playlist.add(line);
+    }
+
+    public List<String> getDeterminadoAInterromper(){
+        return determinadoAInterromper;
+    }
+
+
 }
