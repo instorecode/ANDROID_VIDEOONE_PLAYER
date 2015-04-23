@@ -17,7 +17,7 @@ public class TaskComerciaisDeterminados implements Runnable {
     public void run() {
         bancoDAO.comerciaisDeterminados();
         bancoDAO.controladorComercialDependencia();
-        bancoDAO.criarPlaylistDeterminados();
+        //bancoDAO.criarPlaylistDeterminados();
         bancoDAO.close();
         Log.e("Log", "TaskComerciaisDeterminados");
     }

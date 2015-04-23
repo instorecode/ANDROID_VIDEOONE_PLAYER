@@ -589,7 +589,12 @@ public class BancoDAO {
     }
 
     private void semanaAndHorario(String semana, String horario, String arquivo, String titulo, String categoria, List<ComercialDependencia> listaDependenciasComercialDeterminado) {
+        if(semana != "" && horario != ""){
+
+        }
+
         if (semana.equals("1") || semana.equals("0")) {
+
             if(null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()){
                 for(ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado){
                     String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "|1|0|" + arquivo + "|" + comercialDependencia.titulo + "|" + comercialDependencia.categoria + "|1|2";
