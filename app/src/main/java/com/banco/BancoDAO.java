@@ -174,7 +174,7 @@ public class BancoDAO {
 
     private void video(String codigoCategoria, String horaInicial, String horaFinal) {
         String scriptVideo = "SELECT * FROM VIEW_CARREGAR_VIDEOS WHERE (Categoria1 = " + codigoCategoria + " OR Categoria2 = " + codigoCategoria + " OR Categoria3 = " + codigoCategoria + " )";
-      SQLiteDatabase db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         cursor = db.rawQuery(scriptVideo, new String[]{});
 
         if (cursor.getCount() > 0) {
@@ -182,9 +182,9 @@ public class BancoDAO {
                 String arquivo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
                 String titulo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
                 String velocidade = nuloToVazio(cursor.getString(cursor.getColumnIndex("Velocidade")));
-                String resultado = validarExistenciaDoVideo(arquivo);
-                if (null != resultado) {
-                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + titulo + "|" + codigoCategoria + "|" + velocidade + "|" + "1");
+                String caminhoDoArquivoDeVideo = validarExistenciaDoVideo(arquivo);
+                if (null != caminhoDoArquivoDeVideo) {
+                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivoDeVideo + "|0|0|" + caminhoDoArquivoDeVideo + "|" + titulo + "|" + codigoCategoria + "|" + velocidade + "|1");
                     return;
                 } else {
                     registrarLog.escrever(" Desprezado com tipo 99. O video " + arquivo + " não foi encontrado em nenhum diretório");
@@ -196,7 +196,7 @@ public class BancoDAO {
     private void comercial(String codigoCategoria, String horaInicial, String horaFinal, Short tipoCategoria) {
         SQLiteDatabase db = helper.getWritableDatabase();
         String scriptCategoria = "SELECT * FROM VIEW_CARREGAR_COMERCIAL WHERE (QtdePlayer is null OR QtdePlayer > Qtde) AND  Categoria = " + codigoCategoria;
-       cursor = db.rawQuery(scriptCategoria, new String[]{});
+        cursor = db.rawQuery(scriptCategoria, new String[]{});
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 String arquivo = cursor.getString(cursor.getColumnIndex("Arquivo"));
@@ -206,8 +206,8 @@ public class BancoDAO {
                 String dependencia1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
                 String dependencia2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
                 String dependencia3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
-                boolean resultado = validarDiasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria, dataStr, diasAlternados);
-                if (resultado) {
+                boolean comercialEvalido = validarDiasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria, dataStr, diasAlternados);
+                if (comercialEvalido) {
                     break;
                 }
             }
@@ -232,8 +232,8 @@ public class BancoDAO {
             diaAtual.setTime(new Date());
 
             if (diasAlternados.equals("0")) {
-                boolean resultado = validarDependenciasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria);
-                if (resultado) {
+                boolean comercialEDependenciasExistemNosDiretoriosEBanco = validarDependenciasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria);
+                if (comercialEDependenciasExistemNosDiretoriosEBanco) {
                     return true;
                 }
             } else {
@@ -241,8 +241,8 @@ public class BancoDAO {
                     registrarLog.escrever(" Desprezado com tipo 99. O comercial " + arquivo + " não pode ser tocado devido ter sido cadastrado como dias alternados");
                     return false;
                 } else {
-                    boolean resultado = validarDependenciasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria);
-                    if (resultado) {
+                    boolean comercialEDependenciasExistemNosDiretoriosEBanco = validarDependenciasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria);
+                    if (comercialEDependenciasExistemNosDiretoriosEBanco) {
                         return true;
                     }
                 }
@@ -252,53 +252,53 @@ public class BancoDAO {
     }
 
     private boolean validarDependenciasComercial(String arquivo, String titulo, String dependencia1, String dependencia2, String dependencia3, String horaInicial, String horaFinal, String codigoCategoria) {
-         if (!dependencia1.trim().toLowerCase().equals("nenhuma")) {
-            String resultado = validarExistenciaDoVideo(dependencia1);
-            if (resultado == null) {
+        if (!dependencia1.trim().toLowerCase().equals("nenhuma")) {
+            String caminhoDoArquivo = validarExistenciaDoVideo(dependencia1);
+            if (caminhoDoArquivo == null) {
                 registrarLog.escrever(" Desprezado com tipo 99. A Dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
             } else {
                 ComercialDependencia cd = validarDependenciaNoBanco(dependencia1);
                 if (cd == null) {
                     registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
-                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
+                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|1|0|" + arquivo + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
             }
         }
 
         if (!dependencia2.trim().toLowerCase().equals("nenhuma")) {
-            String resultado = validarExistenciaDoVideo(dependencia2);
-            if (resultado == null) {
+            String caminhoDoArquivo = validarExistenciaDoVideo(dependencia2);
+            if (caminhoDoArquivo == null) {
                 registrarLog.escrever(" Desprezado com tipo 99. A Dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório" + "|0|2");
             } else {
                 ComercialDependencia cd = validarDependenciaNoBanco(dependencia2);
                 if (cd == null) {
                     registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
-                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
+                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|1|0|" + arquivo + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
             }
         }
 
         if (!dependencia3.trim().toLowerCase().equals("nenhuma")) {
-            String resultado = validarExistenciaDoVideo(dependencia2);
-            if (resultado == null) {
+            String caminhoDoArquivo = validarExistenciaDoVideo(dependencia2);
+            if (caminhoDoArquivo == null) {
                 registrarLog.escrever(" Desprezado com tipo 99. A Dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
             } else {
                 ComercialDependencia cd = validarDependenciaNoBanco(dependencia3);
                 if (cd == null) {
                     registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
-                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
+                    listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|1|0|" + arquivo + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
             }
         }
 
-        String resultado = validarExistenciaDoVideo(arquivo);
-        if (resultado == null) {
+        String caminhoDoArquivo = validarExistenciaDoVideo(arquivo);
+        if (caminhoDoArquivo == null) {
             registrarLog.escrever(" Desprezado com tipo 99. O arquivo " + arquivo + " não foi encontrado em nenhum diretório");
         } else {
-            listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + resultado + "|" + titulo + "|" + codigoCategoria + "|0|2");
+            listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|0|0|" + arquivo + "|" + titulo + "|" + codigoCategoria + "|0|2");
             return true;
         }
 
@@ -457,7 +457,7 @@ public class BancoDAO {
         }
     }
 
-    public void controladorComercialDependencia () {
+    public void controladorComercialDependencia() {
         if (null != listaComercialDeterminados && listaComercialDeterminados.size() > 0 && !listaComercialDeterminados.isEmpty()) {
             for (ComercialDet comercialDet : listaComercialDeterminados) {
                 ComercialDet comercialDetComDepencias = dependenciaDeterminados(comercialDet);
@@ -492,7 +492,6 @@ public class BancoDAO {
     }
 
     private ComercialDet dependenciaDeterminados(ComercialDet comercialDet) {
-        Log.e("Log", comercialDet.toString());
         String nomeComercial = comercialDet.arquivo;
         String dependencia1 = comercialDet.dependencia1;
         String dependencia2 = comercialDet.dependencia2;
@@ -502,57 +501,61 @@ public class BancoDAO {
         if (null != arquivoComercialDetermidado) {
             comercialDet.arquivo = arquivoComercialDetermidado;
             ///-----------------------DEPENDENCOA 1 ---------------------------------------------------------------///
-            String resultadoDependencia1 = validarExistenciaDoVideo(dependencia1);
-            if (null != resultadoDependencia1) {
-                ComercialDependencia resultadoExisteNoBanco = validarDependenciaDeUmDeterminadoNoBanco(dependencia1);
-                if (null != resultadoExisteNoBanco) {
-                    resultadoExisteNoBanco.arquivo = resultadoDependencia1;
-                    comercialDet.listaDependencias.add(resultadoExisteNoBanco);
-                } else {
+            if (!dependencia1.toLowerCase().equals("nenhuma") && !dependencia1.toLowerCase().contains("nenhuma")) {
+                String resultadoDependencia1 = validarExistenciaDoVideo(dependencia1);
+                if (null != resultadoDependencia1) {
+                    ComercialDependencia resultadoExisteNoBanco = validarDependenciaDeUmDeterminadoNoBanco(dependencia1);
+                    if (null != resultadoExisteNoBanco) {
+                        resultadoExisteNoBanco.arquivo = resultadoDependencia1;
+                        comercialDet.listaDependencias.add(resultadoExisteNoBanco);
+                    } else {
                /*TODO
                     Colocar a mensagem de desprezada no banco tipo 99
                 */
-                }
-            } else {
+                    }
+                } else {
                /*TODO
                     Colocar a mensagem de desprezada no diretorio tipo 99
                 */
+                }
             }
-
             ///-----------------------DEPENDENCOA 2 ---------------------------------------------------------------///
-            String resultadoDependencia2 = validarExistenciaDoVideo(dependencia2);
-            if (null != resultadoDependencia2) {
-                ComercialDependencia resultadoExisteNoBanco = validarDependenciaDeUmDeterminadoNoBanco(dependencia2);
-                if (null != resultadoExisteNoBanco) {
-                    resultadoExisteNoBanco.arquivo = resultadoDependencia2;
-                    comercialDet.listaDependencias.add(resultadoExisteNoBanco);
-                } else {
+            if (!dependencia2.toLowerCase().equals("nenhuma") && !dependencia2.toLowerCase().contains("nenhuma")) {
+                String resultadoDependencia2 = validarExistenciaDoVideo(dependencia2);
+                if (null != resultadoDependencia2) {
+                    ComercialDependencia resultadoExisteNoBanco = validarDependenciaDeUmDeterminadoNoBanco(dependencia2);
+                    if (null != resultadoExisteNoBanco) {
+                        resultadoExisteNoBanco.arquivo = resultadoDependencia2;
+                        comercialDet.listaDependencias.add(resultadoExisteNoBanco);
+                    } else {
                 /*TODO
                     Colocar a mensagem de desprezada no banco tipo 99
                 */
-                }
-            } else {
+                    }
+                } else {
             /*TODO
                 Colocar a mensagem de desprezada no diretorio tipo 99
              */
+                }
             }
-
             ///-----------------------DEPENDENCOA 3 ---------------------------------------------------------------///
-            String resultadoDependencia3 = validarExistenciaDoVideo(dependencia3);
-            if (null != resultadoDependencia3) {
-                ComercialDependencia resultadoExisteNoBanco = validarDependenciaDeUmDeterminadoNoBanco(dependencia3);
-                if (null != resultadoExisteNoBanco) {
-                    resultadoExisteNoBanco.arquivo = resultadoDependencia3;
-                    comercialDet.listaDependencias.add(resultadoExisteNoBanco);
-                } else {
+            if (!dependencia3.toLowerCase().equals("nenhuma") && !dependencia3.toLowerCase().contains("nenhuma")) {
+                String resultadoDependencia3 = validarExistenciaDoVideo(dependencia3);
+                if (null != resultadoDependencia3) {
+                    ComercialDependencia resultadoExisteNoBanco = validarDependenciaDeUmDeterminadoNoBanco(dependencia3);
+                    if (null != resultadoExisteNoBanco) {
+                        resultadoExisteNoBanco.arquivo = resultadoDependencia3;
+                        comercialDet.listaDependencias.add(resultadoExisteNoBanco);
+                    } else {
                 /*TODO
                     Colocar a mensagem de desprezada no banco tipo 99
                  */
-                }
-            } else {
+                    }
+                } else {
                 /*TODO
                     Colocar a mensagem de desprezada no diretorio tipo 99
                  */
+                }
             }
         } else {
             /*TODO
@@ -586,15 +589,23 @@ public class BancoDAO {
     }
 
     private void semanaAndHorario(String semana, String horario, String arquivo, String titulo, String categoria, List<ComercialDependencia> listaDependenciasComercialDeterminado) {
-        if(null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()){
-            for(ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado){
-                String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "1|" + "0|" + arquivo + titulo + "|" + categoria + "|1|2";
-                linhasPlaylistDet.add(linha);
-            }
-        }
         if (semana.equals("1") || semana.equals("0")) {
-            linhasPlaylistDet.add("det|" + horario + "|" + semana + "|" + arquivo + "|" + titulo + "|" + categoria + "|1|2");
+            if(null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()){
+                for(ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado){
+                    String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "|1|0|" + arquivo + "|" + comercialDependencia.titulo + "|" + comercialDependencia.categoria + "|1|2";
+                    linhasPlaylistDet.add(linha);
+                }
+            }
+            linhasPlaylistDet.add("det|" + horario + "|" + semana + "|" + arquivo + "|0|1|" + arquivo + "|" + titulo + "|" + categoria + "|1|2");
         }
+    }
+
+    private boolean validarDiaAlternadoComercialDeterminado(String arquivo, String dataUltimaExecucao, String diaAlternado) {
+        if (diaAlternado.equals("1") || diaAlternado.contains("1")) {
+
+        }
+
+        return false;
     }
 
     public void criarPlaylistDeterminados() {
