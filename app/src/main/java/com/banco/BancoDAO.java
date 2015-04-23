@@ -454,7 +454,6 @@ public class BancoDAO {
                 comercialDet.dependencia1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
                 comercialDet.dependencia2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
                 comercialDet.dependencia3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
-
                 listaComercialDeterminados.add(comercialDet);
             }
         }
@@ -463,9 +462,7 @@ public class BancoDAO {
     public void controladorComercialDependencia() {
         if (null != listaComercialDeterminados && listaComercialDeterminados.size() > 0 && !listaComercialDeterminados.isEmpty()) {
             for (ComercialDet comercialDet : listaComercialDeterminados) {
-
                 ComercialDet comercialDetComDepencias = dependenciaDeterminados(comercialDet);
-                //Log.e("Log", comercialDetComDepencias.toString());
                 if (null != comercialDetComDepencias) {
                     semanaAndHorario(comercialDet.semana1, comercialDet.horario1, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
                     semanaAndHorario(comercialDet.semana2, comercialDet.horario2, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
@@ -594,28 +591,25 @@ public class BancoDAO {
     }
 
     private void semanaAndHorario(String semana, String horario, String arquivo, String titulo, String categoria, List<ComercialDependencia> listaDependenciasComercialDeterminado) {
-        if (semana != "" && null != semana && horario != "" && null != horario) {
+        if ( !semana.equals("") && !horario.equals("")  ) {
             int diaDaSemanaEmNumero = diaDaSemana();
             if (!("" + semana.charAt(diaDaSemanaEmNumero)).trim().replaceAll("\\s", "").isEmpty()) {
                 if (("" + semana.charAt(diaDaSemanaEmNumero)).trim().toLowerCase().equals("n") || ("" + semana.charAt(diaDaSemanaEmNumero)).trim().toLowerCase().contains("n")) {
-                    semana = "1";
-                } else {
                     semana = "0";
+                } else {
+                    semana = "1";
                 }
 
                 if (null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()) {
                     for (ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado) {
                         String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "|1|0|" + arquivo + "|" + comercialDependencia.titulo + "|" + comercialDependencia.categoria + "|1|2";
-                        Log.e("Log 1", linha);
                         linhasPlaylistDet.add(linha);
                     }
                 }
                 String linha = "det|" + horario + "|" + semana + "|" + arquivo + "|0|1|" + arquivo + "|" + titulo + "|" + categoria + "|1|2";
-                Log.e("Log 2", linha);
                 linhasPlaylistDet.add(linha);
             }
         }
-        Log.e("Log", linhasPlaylistDet.size() + " tamanho da lista 1");
     }
 
     public int diaDaSemana(){
@@ -647,7 +641,6 @@ public class BancoDAO {
     }
 
     public void criarPlaylistDeterminados() {
-        Log.e("Log", "criarPlaylistDeterminados");
         File playlistAntiga = new File(TaskDiretorios.diretorioPlaylist.concat("playlistDet.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();
@@ -670,11 +663,9 @@ public class BancoDAO {
             ImprimirUtils.imprimirErro(BancoDAO.this, e);
         }
 
-        Log.e("Log", linhasPlaylistDet.size() + " tamanho da lista 2");
-
         if (null != linhasPlaylistDet && !linhasPlaylistDet.isEmpty()) {
             for (String linha : linhasPlaylistDet) {
-                Log.e("Log", linha);
+                //Log.e("Log", linha);
                 try {
                     fileWriter.write(linha.concat("\n"));
                 } catch (IOException e) {
