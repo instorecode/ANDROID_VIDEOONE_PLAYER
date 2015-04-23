@@ -10,6 +10,7 @@ import com.bean.ComercialDet;
 import com.br.instore.exp.bean.ComercialExp;
 import com.br.instore.exp.bean.ProgramacaoExp;
 import com.br.instore.utils.Banco;
+import com.br.instore.utils.DiasDaSemana;
 import com.br.instore.utils.ImprimirUtils;
 import com.utils.RegistrarLog;
 import java.io.File;
@@ -21,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
@@ -36,6 +38,7 @@ public class BancoDAO {
     private RegistrarLog registrarLog;
     private DatabaseHelper helper;
     private SQLiteDatabase db;
+    private DiasDaSemana diasDaSemana = new DiasDaSemana();
 
     public BancoDAO(Context context) {
         this.helper = new DatabaseHelper(context);
@@ -460,7 +463,9 @@ public class BancoDAO {
     public void controladorComercialDependencia() {
         if (null != listaComercialDeterminados && listaComercialDeterminados.size() > 0 && !listaComercialDeterminados.isEmpty()) {
             for (ComercialDet comercialDet : listaComercialDeterminados) {
+
                 ComercialDet comercialDetComDepencias = dependenciaDeterminados(comercialDet);
+                //Log.e("Log", comercialDetComDepencias.toString());
                 if (null != comercialDetComDepencias) {
                     semanaAndHorario(comercialDet.semana1, comercialDet.horario1, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
                     semanaAndHorario(comercialDet.semana2, comercialDet.horario2, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
@@ -589,31 +594,60 @@ public class BancoDAO {
     }
 
     private void semanaAndHorario(String semana, String horario, String arquivo, String titulo, String categoria, List<ComercialDependencia> listaDependenciasComercialDeterminado) {
-        if(semana != "" && horario != ""){
-
-        }
-
-        if (semana.equals("1") || semana.equals("0")) {
-
-            if(null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()){
-                for(ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado){
-                    String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "|1|0|" + arquivo + "|" + comercialDependencia.titulo + "|" + comercialDependencia.categoria + "|1|2";
-                    linhasPlaylistDet.add(linha);
+        if (semana != "" && null != semana && horario != "" && null != horario) {
+            int diaDaSemanaEmNumero = diaDaSemana();
+            if (!("" + semana.charAt(diaDaSemanaEmNumero)).trim().replaceAll("\\s", "").isEmpty()) {
+                if (("" + semana.charAt(diaDaSemanaEmNumero)).trim().toLowerCase().equals("n") || ("" + semana.charAt(diaDaSemanaEmNumero)).trim().toLowerCase().contains("n")) {
+                    semana = "1";
+                } else {
+                    semana = "0";
                 }
+
+                if (null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()) {
+                    for (ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado) {
+                        String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "|1|0|" + arquivo + "|" + comercialDependencia.titulo + "|" + comercialDependencia.categoria + "|1|2";
+                        Log.e("Log 1", linha);
+                        linhasPlaylistDet.add(linha);
+                    }
+                }
+                String linha = "det|" + horario + "|" + semana + "|" + arquivo + "|0|1|" + arquivo + "|" + titulo + "|" + categoria + "|1|2";
+                Log.e("Log 2", linha);
+                linhasPlaylistDet.add(linha);
             }
-            linhasPlaylistDet.add("det|" + horario + "|" + semana + "|" + arquivo + "|0|1|" + arquivo + "|" + titulo + "|" + categoria + "|1|2");
         }
+        Log.e("Log", linhasPlaylistDet.size() + " tamanho da lista 1");
     }
 
-    private boolean validarDiaAlternadoComercialDeterminado(String arquivo, String dataUltimaExecucao, String diaAlternado) {
-        if (diaAlternado.equals("1") || diaAlternado.contains("1")) {
-
+    public int diaDaSemana(){
+        Integer numeroDia = 0;
+        switch (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+            case 1:
+                numeroDia = 7;
+                break;
+            case 2:
+                numeroDia = 1;
+                break;
+            case 3:
+                numeroDia = 2;
+                break;
+            case 4:
+                numeroDia = 3;
+                break;
+            case 5:
+                numeroDia = 4;
+                break;
+            case 6:
+                numeroDia = 5;
+                break;
+            case 7:
+                numeroDia = 6;
+                break;
         }
-
-        return false;
+        return numeroDia;
     }
 
     public void criarPlaylistDeterminados() {
+        Log.e("Log", "criarPlaylistDeterminados");
         File playlistAntiga = new File(TaskDiretorios.diretorioPlaylist.concat("playlistDet.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();
@@ -636,8 +670,11 @@ public class BancoDAO {
             ImprimirUtils.imprimirErro(BancoDAO.this, e);
         }
 
+        Log.e("Log", linhasPlaylistDet.size() + " tamanho da lista 2");
+
         if (null != linhasPlaylistDet && !linhasPlaylistDet.isEmpty()) {
             for (String linha : linhasPlaylistDet) {
+                Log.e("Log", linha);
                 try {
                     fileWriter.write(linha.concat("\n"));
                 } catch (IOException e) {
