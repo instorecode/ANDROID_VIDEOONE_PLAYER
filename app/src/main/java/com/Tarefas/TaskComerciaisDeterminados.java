@@ -1,6 +1,7 @@
 package com.Tarefas;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.banco.BancoDAO;
 
@@ -18,5 +19,6 @@ public class TaskComerciaisDeterminados implements Runnable {
         bancoDAO.controladorComercialDependencia();
         bancoDAO.criarPlaylistDeterminados();
         bancoDAO.close();
+        Log.e("Log", "TaskComerciaisDeterminados");
     }
 }

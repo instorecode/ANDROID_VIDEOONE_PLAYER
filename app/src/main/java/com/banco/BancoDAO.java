@@ -492,6 +492,7 @@ public class BancoDAO {
     }
 
     private ComercialDet dependenciaDeterminados(ComercialDet comercialDet) {
+        Log.e("Log", comercialDet.toString());
         String nomeComercial = comercialDet.arquivo;
         String dependencia1 = comercialDet.dependencia1;
         String dependencia2 = comercialDet.dependencia2;
