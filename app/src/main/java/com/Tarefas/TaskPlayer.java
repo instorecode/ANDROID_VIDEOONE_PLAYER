@@ -226,10 +226,10 @@ public class TaskPlayer implements Runnable {
         } else {
             Log.e("Log", "Video não é nulo, Playlist = " + playlist.size());
             final String video = line.split("\\|")[3];
-            final String titulo = line.split("\\|")[4];
-            final String categoria = line.split("\\|")[5];
-            final String velocidade = line.split("\\|")[6];
-            final String tipoCategoria = line.split("\\|")[7];
+            final String titulo = line.split("\\|")[7];
+            final String categoria = line.split("\\|")[8];
+            final String velocidade = line.split("\\|")[9];
+            final String tipoCategoria = line.split("\\|")[10];
             arquivoVideo = new File(video);
             videoView = (VideoView) main.findViewById(R.id.video);
             videoView.setVisibility(View.VISIBLE);

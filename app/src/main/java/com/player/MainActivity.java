@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
         thread5.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 700, 30000, TimeUnit.MILLISECONDS);
     }
 
-    /*@Override
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -53,10 +53,10 @@ public class MainActivity extends Activity {
         //handlerNormal.post(new TaskPlayer(this, handlerNormal,getApplicationContext()));
         handlerNormal.post(taskPlayer);
 
-        final Handler handlerDeterminados = new Handler();
-        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer));
+       /* final Handler handlerDeterminados = new Handler();
+        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer));*/
 
-    }*/
+    }
 
 
 }

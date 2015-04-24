@@ -593,7 +593,6 @@ public class BancoDAO {
             if (dataUltimaExecucao.isEmpty() || dataUltimaExecucao.equals("")) {
                 popularListaDeLinhasPlaylistDet(listaDependenciasComercialDeterminado, horario, semana, arquivo, titulo, categoria);
             } else {
-                //int diaDaSemanaEmNumero = DataUtils.diaDaSemana();
                 int diaDaUltimaExecucaoEmNumero = DataUtils.dataDaUltimaExecucaoParaNumero(dataUltimaExecucao);
                 int diaAtualEmNumero = DataUtils.diaDaSemana();
                 List<String> lista = new ArrayList<String>();
@@ -619,7 +618,6 @@ public class BancoDAO {
 
                 if (posicaoNaListaDoDiaAtual != 8 && posicaoNaListaDoDiaQueTocou != 8) {
                     if (posicaoNaListaDoDiaQueTocou != (posicaoNaListaDoDiaAtual - 1)) {
-                        System.out.println("grava a linha");
                         popularListaDeLinhasPlaylistDet(listaDependenciasComercialDeterminado, horario, semana, arquivo, titulo, categoria);
                     }
                 }
@@ -628,6 +626,12 @@ public class BancoDAO {
     }
 
     private void popularListaDeLinhasPlaylistDet(List<ComercialDependencia> listaDependenciasComercialDeterminado, String horario, String semana, String arquivo, String titulo, String categoria){
+        if (("" + semana.charAt(DataUtils.diaDaSemana())).trim().toLowerCase().equals("n") || ("" + semana.charAt(DataUtils.diaDaSemana())).trim().toLowerCase().contains("n")) {
+            semana = "0";
+        } else {
+            semana = "1";
+        }
+
         if (null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()) {
             for (ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado) {
                 String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "|1|0|" + arquivo + "|" + comercialDependencia.titulo + "|" + comercialDependencia.categoria + "|1|2";
