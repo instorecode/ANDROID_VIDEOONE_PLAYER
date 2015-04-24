@@ -7,11 +7,11 @@ import android.util.Log;
 import com.Tarefas.TaskDiretorios;
 import com.bean.ComercialDependencia;
 import com.bean.ComercialDet;
-import com.br.instore.exp.bean.ComercialExp;
 import com.br.instore.exp.bean.ProgramacaoExp;
 import com.br.instore.utils.Banco;
-import com.br.instore.utils.DiasDaSemana;
+import com.br.instore.utils.DataUtils;
 import com.br.instore.utils.ImprimirUtils;
+import com.br.instore.utils.StringUtils;
 import com.utils.RegistrarLog;
 import java.io.File;
 import java.io.FileWriter;
@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
@@ -38,7 +37,6 @@ public class BancoDAO {
     private RegistrarLog registrarLog;
     private DatabaseHelper helper;
     private SQLiteDatabase db;
-    private DiasDaSemana diasDaSemana = new DiasDaSemana();
 
     public BancoDAO(Context context) {
         this.helper = new DatabaseHelper(context);
@@ -182,9 +180,9 @@ public class BancoDAO {
 
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
-                String arquivo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
-                String titulo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                String velocidade = nuloToVazio(cursor.getString(cursor.getColumnIndex("Velocidade")));
+                String arquivo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
+                String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
+                String velocidade = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Velocidade")));
                 String caminhoDoArquivoDeVideo = validarExistenciaDoVideo(arquivo);
                 if (null != caminhoDoArquivoDeVideo) {
                     listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivoDeVideo + "|0|0|" + caminhoDoArquivoDeVideo + "|" + titulo + "|" + codigoCategoria + "|" + velocidade + "|1");
@@ -205,10 +203,10 @@ public class BancoDAO {
                 String arquivo = cursor.getString(cursor.getColumnIndex("Arquivo"));
                 String diasAlternados = cursor.getString(cursor.getColumnIndex("DiasAlternados"));
                 String dataStr = cursor.getString(cursor.getColumnIndex("Data"));
-                String titulo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                String dependencia1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
-                String dependencia2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
-                String dependencia3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
+                String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
+                String dependencia1 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
+                String dependencia2 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
+                String dependencia3 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
                 boolean comercialEvalido = validarDiasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria, dataStr, diasAlternados);
                 if (comercialEvalido) {
                     break;
@@ -313,9 +311,9 @@ public class BancoDAO {
         String script = "SELECT * FROM VIEW_CARREGAR_COMERCIAL WHERE Arquivo = '" + nome + "'";
         cursor = db.rawQuery(script, new String[]{});
         if (cursor.moveToFirst()) {
-            String arquivo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
-            String titulo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-            String categoria = nuloToVazio(cursor.getString(cursor.getColumnIndex("Categoria")));
+            String arquivo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
+            String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
+            String categoria = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Categoria")));
 
             ComercialDependencia cd = new ComercialDependencia();
             cd.arquivo = arquivo;
@@ -388,72 +386,72 @@ public class BancoDAO {
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 ComercialDet comercialDet = new ComercialDet();
-                comercialDet.arquivo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
-                comercialDet.cliente = nuloToVazio(cursor.getString(cursor.getColumnIndex("Cliente")));
-                comercialDet.titulo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
+                comercialDet.arquivo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
+                comercialDet.cliente = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Cliente")));
+                comercialDet.titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
                 comercialDet.categoria = cursor.getString(cursor.getColumnIndex("Categoria"));
-                comercialDet.dataInicial = nuloToVazio(cursor.getString(cursor.getColumnIndex("PeriodoInicial")));
-                comercialDet.dataFinal = nuloToVazio(cursor.getString(cursor.getColumnIndex("PeriodoFinal")));
-                comercialDet.horario1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario1")));
-                comercialDet.horario2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario2")));
-                comercialDet.horario3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario3")));
-                comercialDet.horario4 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario4")));
-                comercialDet.horario5 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario5")));
-                comercialDet.horario6 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario6")));
-                comercialDet.horario7 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario7")));
-                comercialDet.horario8 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario8")));
-                comercialDet.horario9 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario9")));
-                comercialDet.horario10 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario10")));
-                comercialDet.horario11 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario11")));
-                comercialDet.horario12 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario12")));
-                comercialDet.horario13 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario13")));
-                comercialDet.horario14 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario14")));
-                comercialDet.horario15 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario15")));
-                comercialDet.horario16 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario16")));
-                comercialDet.horario17 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario17")));
-                comercialDet.horario18 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario18")));
-                comercialDet.horario19 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario19")));
-                comercialDet.horario20 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario20")));
-                comercialDet.horario21 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario21")));
-                comercialDet.horario22 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario22")));
-                comercialDet.horario23 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario23")));
-                comercialDet.horario24 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Horario24")));
-                comercialDet.semana1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana1")));
-                comercialDet.semana2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
-                comercialDet.semana3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
-                comercialDet.semana4 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana4")));
-                comercialDet.semana5 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana5")));
-                comercialDet.semana6 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana6")));
-                comercialDet.semana7 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana7")));
-                comercialDet.semana8 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana8")));
-                comercialDet.semana9 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana9")));
-                comercialDet.semana10 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana10")));
-                comercialDet.semana11 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana11")));
-                comercialDet.semana12 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana12")));
-                comercialDet.semana13 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana13")));
-                comercialDet.semana14 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana14")));
-                comercialDet.semana15 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana15")));
-                comercialDet.semana16 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana16")));
-                comercialDet.semana17 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana17")));
-                comercialDet.semana18 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana18")));
-                comercialDet.semana19 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana19")));
-                comercialDet.semana20 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana20")));
-                comercialDet.semana21 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana21")));
-                comercialDet.semana22 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana22")));
-                comercialDet.semana23 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana23")));
-                comercialDet.semana24 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Semana24")));
-                comercialDet.diaSemana = nuloToVazio(cursor.getString(cursor.getColumnIndex("DiaSemana")));
+                comercialDet.dataInicial = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("PeriodoInicial")));
+                comercialDet.dataFinal = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("PeriodoFinal")));
+                comercialDet.horario1 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario1")));
+                comercialDet.horario2 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario2")));
+                comercialDet.horario3 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario3")));
+                comercialDet.horario4 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario4")));
+                comercialDet.horario5 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario5")));
+                comercialDet.horario6 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario6")));
+                comercialDet.horario7 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario7")));
+                comercialDet.horario8 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario8")));
+                comercialDet.horario9 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario9")));
+                comercialDet.horario10 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario10")));
+                comercialDet.horario11 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario11")));
+                comercialDet.horario12 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario12")));
+                comercialDet.horario13 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario13")));
+                comercialDet.horario14 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario14")));
+                comercialDet.horario15 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario15")));
+                comercialDet.horario16 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario16")));
+                comercialDet.horario17 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario17")));
+                comercialDet.horario18 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario18")));
+                comercialDet.horario19 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario19")));
+                comercialDet.horario20 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario20")));
+                comercialDet.horario21 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario21")));
+                comercialDet.horario22 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario22")));
+                comercialDet.horario23 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario23")));
+                comercialDet.horario24 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario24")));
+                comercialDet.semana1 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana1")));
+                comercialDet.semana2 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
+                comercialDet.semana3 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
+                comercialDet.semana4 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana4")));
+                comercialDet.semana5 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana5")));
+                comercialDet.semana6 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana6")));
+                comercialDet.semana7 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana7")));
+                comercialDet.semana8 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana8")));
+                comercialDet.semana9 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana9")));
+                comercialDet.semana10 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana10")));
+                comercialDet.semana11 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana11")));
+                comercialDet.semana12 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana12")));
+                comercialDet.semana13 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana13")));
+                comercialDet.semana14 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana14")));
+                comercialDet.semana15 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana15")));
+                comercialDet.semana16 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana16")));
+                comercialDet.semana17 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana17")));
+                comercialDet.semana18 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana18")));
+                comercialDet.semana19 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana19")));
+                comercialDet.semana20 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana20")));
+                comercialDet.semana21 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana21")));
+                comercialDet.semana22 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana22")));
+                comercialDet.semana23 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana23")));
+                comercialDet.semana24 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana24")));
+                comercialDet.diaSemana = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("DiaSemana")));
                 comercialDet.diasAlternados = (cursor.getString(cursor.getColumnIndex("DiasAlternados")) == "1") ? true : false;
-                comercialDet.data = nuloToVazio(cursor.getString(cursor.getColumnIndex("Data")));
-                comercialDet.ultimaExecucao = nuloToVazio(cursor.getString(cursor.getColumnIndex("UltimaExecucao")));
-                comercialDet.tempoTotal = nuloToVazio(cursor.getString(cursor.getColumnIndex("TempoTotal")));
+                comercialDet.data = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Data")));
+                comercialDet.ultimaExecucao = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("UltimaExecucao")));
+                comercialDet.tempoTotal = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("TempoTotal")));
                 comercialDet.random = cursor.getInt(cursor.getColumnIndex("Random"));
                 comercialDet.qtdePlayer = cursor.getInt(cursor.getColumnIndex("QtdePlayer"));
                 comercialDet.qtdePlayer = cursor.getInt(cursor.getColumnIndex("Qtde"));
-                comercialDet.dataVencimento = nuloToVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
-                comercialDet.dependencia1 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
-                comercialDet.dependencia2 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
-                comercialDet.dependencia3 = nuloToVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
+                comercialDet.dataVencimento = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
+                comercialDet.dependencia1 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
+                comercialDet.dependencia2 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
+                comercialDet.dependencia3 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
                 listaComercialDeterminados.add(comercialDet);
             }
         }
@@ -464,30 +462,30 @@ public class BancoDAO {
             for (ComercialDet comercialDet : listaComercialDeterminados) {
                 ComercialDet comercialDetComDepencias = dependenciaDeterminados(comercialDet);
                 if (null != comercialDetComDepencias) {
-                    semanaAndHorario(comercialDet.semana1, comercialDet.horario1, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana2, comercialDet.horario2, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana3, comercialDet.horario3, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana4, comercialDet.horario4, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana5, comercialDet.horario5, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana6, comercialDet.horario6, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana7, comercialDet.horario7, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana8, comercialDet.horario8, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana9, comercialDet.horario9, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana10, comercialDet.horario10, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana11, comercialDet.horario11, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana12, comercialDet.horario12, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana13, comercialDet.horario13, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana14, comercialDet.horario14, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana15, comercialDet.horario15, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana16, comercialDet.horario16, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana17, comercialDet.horario17, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana18, comercialDet.horario18, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana19, comercialDet.horario19, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana20, comercialDet.horario20, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana21, comercialDet.horario21, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana22, comercialDet.horario22, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana23, comercialDet.horario23, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
-                    semanaAndHorario(comercialDet.semana24, comercialDet.horario24, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias);
+                    semanaAndHorario(comercialDet.semana1, comercialDet.horario1, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana2, comercialDet.horario2, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana3, comercialDet.horario3, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana4, comercialDet.horario4, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana5, comercialDet.horario5, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana6, comercialDet.horario6, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana7, comercialDet.horario7, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana8, comercialDet.horario8, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana9, comercialDet.horario9, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana10, comercialDet.horario10, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana11, comercialDet.horario11, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana12, comercialDet.horario12, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana13, comercialDet.horario13, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana14, comercialDet.horario14, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana15, comercialDet.horario15, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana16, comercialDet.horario16, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana17, comercialDet.horario17, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana18, comercialDet.horario18, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana19, comercialDet.horario19, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana20, comercialDet.horario20, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana21, comercialDet.horario21, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana22, comercialDet.horario22, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana23, comercialDet.horario23, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
+                    semanaAndHorario(comercialDet.semana24, comercialDet.horario24, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
                 }
             }
         }
@@ -575,14 +573,14 @@ public class BancoDAO {
         if (cursorDependencia.getCount() > 0) {
             ComercialDependencia comercialDependencia = new ComercialDependencia();
             while (cursorDependencia.moveToNext()) {
-                comercialDependencia.arquivo = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Arquivo")));
-                comercialDependencia.cliente = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Cliente")));
-                comercialDependencia.categoria = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Categoria")));
-                comercialDependencia.data = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Data")));
-                comercialDependencia.dataInicial = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("PeriodoInicial")));
-                comercialDependencia.dataFinal = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("PeriodoFinal")));
-                comercialDependencia.dataVencimento = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("DataVencto")));
-                comercialDependencia.titulo = nuloToVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Titulo")));
+                comercialDependencia.arquivo = StringUtils.nuloParaVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Arquivo")));
+                comercialDependencia.cliente = StringUtils.nuloParaVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Cliente")));
+                comercialDependencia.categoria = StringUtils.nuloParaVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Categoria")));
+                comercialDependencia.data = StringUtils.nuloParaVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Data")));
+                comercialDependencia.dataInicial = StringUtils.nuloParaVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("PeriodoInicial")));
+                comercialDependencia.dataFinal = StringUtils.nuloParaVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("PeriodoFinal")));
+                comercialDependencia.dataVencimento = StringUtils.nuloParaVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("DataVencto")));
+                comercialDependencia.titulo = StringUtils.nuloParaVazio(cursorDependencia.getString(cursorDependencia.getColumnIndex("Titulo")));
             }
             return comercialDependencia;
         }
@@ -590,55 +588,57 @@ public class BancoDAO {
         return null;
     }
 
-    private void semanaAndHorario(String semana, String horario, String arquivo, String titulo, String categoria, List<ComercialDependencia> listaDependenciasComercialDeterminado) {
-        if ( !semana.equals("") && !horario.equals("")  ) {
-            int diaDaSemanaEmNumero = diaDaSemana();
-            if (!("" + semana.charAt(diaDaSemanaEmNumero)).trim().replaceAll("\\s", "").isEmpty()) {
-                if (("" + semana.charAt(diaDaSemanaEmNumero)).trim().toLowerCase().equals("n") || ("" + semana.charAt(diaDaSemanaEmNumero)).trim().toLowerCase().contains("n")) {
-                    semana = "0";
-                } else {
-                    semana = "1";
-                }
+    private void semanaAndHorario(String semana, String horario, String arquivo, String titulo, String categoria, List<ComercialDependencia> listaDependenciasComercialDeterminado, String dataUltimaExecucao) {
+        if (!semana.equals("") && !horario.equals("")) {
+            if (dataUltimaExecucao.isEmpty() || dataUltimaExecucao.equals("")) {
+                popularListaDeLinhasPlaylistDet(listaDependenciasComercialDeterminado, horario, semana, arquivo, titulo, categoria);
+            } else {
+                //int diaDaSemanaEmNumero = DataUtils.diaDaSemana();
+                int diaDaUltimaExecucaoEmNumero = DataUtils.dataDaUltimaExecucaoParaNumero(dataUltimaExecucao);
+                int diaAtualEmNumero = DataUtils.diaDaSemana();
+                List<String> lista = new ArrayList<String>();
 
-                if (null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()) {
-                    for (ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado) {
-                        String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "|1|0|" + arquivo + "|" + comercialDependencia.titulo + "|" + comercialDependencia.categoria + "|1|2";
-                        linhasPlaylistDet.add(linha);
+                for (int i = 0; i <= (semana.length() - 1); i++) {
+                    if (!StringUtils.verificarSeVazio("" + semana.charAt(i))) {
+                        lista.add("" + (i + 1));
                     }
                 }
-                String linha = "det|" + horario + "|" + semana + "|" + arquivo + "|0|1|" + arquivo + "|" + titulo + "|" + categoria + "|1|2";
-                linhasPlaylistDet.add(linha);
+
+                int posicaoNaListaDoDiaQueTocou = 8;
+                int posicaoNaListaDoDiaAtual = 8;
+
+                for (String string : lista) {
+                    if (Integer.parseInt(string) == diaDaUltimaExecucaoEmNumero) {
+                        posicaoNaListaDoDiaQueTocou = lista.indexOf(string);
+                    }
+
+                    if (Integer.parseInt(string) == diaAtualEmNumero) {
+                        posicaoNaListaDoDiaAtual = lista.indexOf(string);
+                    }
+                }
+
+                if (posicaoNaListaDoDiaAtual != 8 && posicaoNaListaDoDiaQueTocou != 8) {
+                    if (posicaoNaListaDoDiaQueTocou != (posicaoNaListaDoDiaAtual - 1)) {
+                        System.out.println("grava a linha");
+                        popularListaDeLinhasPlaylistDet(listaDependenciasComercialDeterminado, horario, semana, arquivo, titulo, categoria);
+                    }
+                }
             }
         }
     }
 
-    public int diaDaSemana(){
-        Integer numeroDia = 0;
-        switch (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
-            case 1:
-                numeroDia = 7;
-                break;
-            case 2:
-                numeroDia = 1;
-                break;
-            case 3:
-                numeroDia = 2;
-                break;
-            case 4:
-                numeroDia = 3;
-                break;
-            case 5:
-                numeroDia = 4;
-                break;
-            case 6:
-                numeroDia = 5;
-                break;
-            case 7:
-                numeroDia = 6;
-                break;
+    private void popularListaDeLinhasPlaylistDet(List<ComercialDependencia> listaDependenciasComercialDeterminado, String horario, String semana, String arquivo, String titulo, String categoria){
+        if (null != listaDependenciasComercialDeterminado && listaDependenciasComercialDeterminado.size() > 0 && !listaDependenciasComercialDeterminado.isEmpty()) {
+            for (ComercialDependencia comercialDependencia : listaDependenciasComercialDeterminado) {
+                String linha = "det|" + horario + "|" + semana + "|" + comercialDependencia.arquivo + "|1|0|" + arquivo + "|" + comercialDependencia.titulo + "|" + comercialDependencia.categoria + "|1|2";
+                linhasPlaylistDet.add(linha);
+            }
         }
-        return numeroDia;
+        String linha = "det|" + horario + "|" + semana + "|" + arquivo + "|0|1|" + arquivo + "|" + titulo + "|" + categoria + "|1|2";
+        linhasPlaylistDet.add(linha);
+
     }
+
 
     public void criarPlaylistDeterminados() {
         File playlistAntiga = new File(TaskDiretorios.diretorioPlaylist.concat("playlistDet.exp"));
@@ -711,8 +711,8 @@ public class BancoDAO {
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 String arquivo = cursor.getString(cursor.getColumnIndex("Arquivo"));
-                String titulo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                String dataVencto = nuloToVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
+                String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
+                String dataVencto = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
                 String resuldado = validarExistenciaDoVideo(arquivo);
                 if (resuldado != null) {
                     File file = new File(resuldado);
@@ -731,8 +731,8 @@ public class BancoDAO {
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 String arquivo = cursor.getString(cursor.getColumnIndex("Arquivo"));
-                String titulo = nuloToVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                String dataVencto = nuloToVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
+                String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
+                String dataVencto = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
                 String resuldado = validarExistenciaDoVideo(arquivo);
 
                 if (resuldado != null) {
@@ -860,10 +860,5 @@ public class BancoDAO {
         return valor;
     }
 
-    private String nuloToVazio(String texto) {
-        if (null == texto) {
-            return "";
-        }
-        return texto;
-    }
+
 }
