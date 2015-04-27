@@ -2,6 +2,8 @@ package com.Tarefas;
 
 import android.content.Context;
 import android.os.Environment;
+import android.widget.Toast;
+
 import com.br.instore.utils.ConfiguaracaoUtils;
 import com.utils.RegistrarLog;
 
@@ -28,5 +30,6 @@ public class TaskLerProperties implements Runnable {
         } else {
             registrarLog.escrever(" Properties não existe TaskLerProperties");
         }
+        Toast.makeText(context, "TaskLerProperties", Toast.LENGTH_LONG).show();
     }
 }

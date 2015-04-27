@@ -1,8 +1,11 @@
 package com.Tarefas;
 
+import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.br.instore.utils.ConfiguaracaoUtils;
 import com.br.instore.utils.ImprimirUtils;
 import java.io.BufferedReader;
@@ -27,15 +30,17 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
     private final String barraDoSistema = System.getProperty("file.separator");
     private final String caminho = Environment.getExternalStorageDirectory().toString();
     private TaskPlayer taskPlayer;
+    private Context context;
 
-
-    public TaskPlayerComericiaisDeterminados(Handler handler, TaskPlayer taskPlayer) {
+    public TaskPlayerComericiaisDeterminados(Handler handler, TaskPlayer taskPlayer, Context context) {
         this.handler = handler;
         this.taskPlayer = taskPlayer;
+        this.context = context;
     }
 
     @Override
     public void run() {
+        Toast.makeText(context, "TaskPlayerComericiaisDeterminados", Toast.LENGTH_LONG).show();
         Log.e("Log", "Rodando THREAD DETERMINADO");
         controlador();
     }

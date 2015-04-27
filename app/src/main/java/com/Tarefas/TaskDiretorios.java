@@ -1,6 +1,9 @@
 package com.Tarefas;
 
+import android.content.Context;
 import android.os.Environment;
+import android.widget.Toast;
+
 import com.br.instore.utils.Arquivo;
 import com.br.instore.utils.ConfiguaracaoUtils;
 
@@ -14,6 +17,12 @@ public class TaskDiretorios implements Runnable {
     public static String diretorioVideoSecundario = "";
     public static String diretorioVideoTerciario = "";
     public static String diretorioPlaylist = "";
+    private Context context;
+
+
+    public TaskDiretorios (Context context){
+        this.context = context;
+    }
 
     @Override
     public void run() {
@@ -35,5 +44,6 @@ public class TaskDiretorios implements Runnable {
         this.diretorioVideoSecundario = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioSecundarioVideo()).concat(barraDoSistema);
         this.diretorioVideoTerciario = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioTerciario()).concat(barraDoSistema);
         this.diretorioPlaylist = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema);
+        Toast.makeText(context, "TaskDiretorios", Toast.LENGTH_LONG).show();
     }
 }

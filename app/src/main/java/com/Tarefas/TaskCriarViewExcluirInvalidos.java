@@ -2,6 +2,8 @@ package com.Tarefas;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.banco.BancoDAO;
 
 import java.io.File;
@@ -25,5 +27,6 @@ public class TaskCriarViewExcluirInvalidos implements Runnable {
         bancoDAO.excluirComercialDoBanco();
         bancoDAO.excluirVideosDoBanco();
         bancoDAO.close();
+        Toast.makeText(context, "TaskCriarViewExcluirInvalidos", Toast.LENGTH_LONG).show();
     }
 }

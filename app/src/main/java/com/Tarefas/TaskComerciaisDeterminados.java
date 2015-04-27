@@ -2,16 +2,21 @@ package com.Tarefas;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.banco.BancoDAO;
 
 public class TaskComerciaisDeterminados implements Runnable {
 
     private BancoDAO bancoDAO;
+    private Context context;
 
     public TaskComerciaisDeterminados(Context context) {
         this.bancoDAO = new BancoDAO(context);
+        this.context = context;
     }
+
+
 
     @Override
     public void run() {
@@ -19,6 +24,7 @@ public class TaskComerciaisDeterminados implements Runnable {
         bancoDAO.controladorComercialDependencia();
         bancoDAO.criarPlaylistDeterminados();
         bancoDAO.close();
-        Log.e("Log", "TaskComerciaisDeterminados");
+        Toast.makeText(context, "TaskComerciaisDeterminados", Toast.LENGTH_LONG).show();
+
     }
 }

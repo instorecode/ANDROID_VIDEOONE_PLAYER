@@ -2,6 +2,7 @@ package com.Tarefas;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.banco.BancoDAO;
 
@@ -18,5 +19,6 @@ public class TaskVideoAndComerciais implements Runnable {
         bancoDAO = new BancoDAO(context);
         bancoDAO.programacoes();
         bancoDAO.close();
+        Toast.makeText(context, "TaskVideoAndComerciais", Toast.LENGTH_LONG).show();
     }
 }

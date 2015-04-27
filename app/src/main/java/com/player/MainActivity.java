@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
         ScheduledExecutorService thread4 = Executors.newScheduledThreadPool(1);
         ScheduledExecutorService thread5 = Executors.newScheduledThreadPool(1);
         thread1.scheduleAtFixedRate(new TaskLerProperties(context), 0, 10, TimeUnit.SECONDS);
-        thread2.scheduleAtFixedRate(new TaskDiretorios(), 500, 10000, TimeUnit.MILLISECONDS);
+        thread2.scheduleAtFixedRate(new TaskDiretorios(context), 500, 10000, TimeUnit.MILLISECONDS);
         thread3.scheduleAtFixedRate(new TaskCriarViewExcluirInvalidos(context), 600, 3600000, TimeUnit.MILLISECONDS);
         thread4.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 700, 30000, TimeUnit.MILLISECONDS);
         thread5.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 700, 30000, TimeUnit.MILLISECONDS);
@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
         handlerNormal.post(taskPlayer);
 
         final Handler handlerDeterminados = new Handler();
-        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer));
+        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer, context));
 
     }
 
