@@ -40,7 +40,7 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
 
     @Override
     public void run() {
-      Log.e("Log", "Rodando THREAD DETERMINADO");
+        Log.e("Log", "Rodando THREAD DETERMINADO");
         controlador();
     }
 
@@ -99,18 +99,12 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
     private void validarSeOComercialInterrompe(List<String> listaDeComerciaisNoHorario) {
         if (listaDeComerciaisNoHorario != null && !listaDeComerciaisNoHorario.isEmpty()) {
             for (String comercial : listaDeComerciaisNoHorario) {
-
                 String comercialInterrompe = comercial.split("\\|")[2];
-                String flag = comercial.split("\\|")[0];
-
-                    if (comercialInterrompe.contains("0") || comercialInterrompe.equals("0")) {
-                        Log.e("Log", comercial + " não interrompe");
-                        listaValidarSeOComercialNaoInterrompe.add(comercial);
-                    } else {
-                        Log.e("Log", comercial + " interrompe");
-                        listaValidarSeOComercialInterrompe.add(comercial);
-                    }
-
+                if (comercialInterrompe.contains("0") || comercialInterrompe.equals("0")) {
+                    listaValidarSeOComercialNaoInterrompe.add(comercial);
+                } else {
+                    listaValidarSeOComercialInterrompe.add(comercial);
+                }
             }
         }
         listaCapturarVideoATocar.clear();

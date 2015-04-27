@@ -59,33 +59,33 @@ public class TaskPlayer implements Runnable {
     @Override
     public void run() {
         Log.e("Log", "Rodando a thread do player");
-        Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
+        //Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
         if (playlist == null || playlist.isEmpty()) {
-            Log.e("Log","1");
+            //Log.e("Log","1");
             lerLinhas();
             if (videoVazio) {
-                Log.e("Log","2");
+                //Log.e("Log","2");
                 executar(null);
                 return;
             } else {
-                Log.e("Log","3");
+                //Log.e("Log","3");
                 String linha = playlist.get(0);
                 String flag = linha.split("\\|")[0];
                 if(flag.equals("det") || flag.contains("det")){
-                    Log.e("Log","4");
+                    //Log.e("Log","4");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                     return;
                 } else {
-                    Log.e("Log","5");
+                  //  Log.e("Log","5");
                     boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                     if (retornoHorarioDaLinha) {
-                        Log.e("Log","6");
+                //        Log.e("Log","6");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(linha);
                         return;
                     } else {
-                        Log.e("Log","7");
+              //          Log.e("Log","7");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(null);
                         return;
@@ -93,24 +93,24 @@ public class TaskPlayer implements Runnable {
                 }
             }
         } else {
-            Log.e("Log","8");
+            //Log.e("Log","8");
             String linha = playlist.get(0);
             String flag = linha.split("\\|")[0];
             if(flag.equals("det") || flag.contains("det")) {
-                Log.e("Log","9");
+                //Log.e("Log","9");
                 playlist = new ArrayList(playlist.subList(1, playlist.size()));
                 executar(linha);
                 return;
             } else {
-                Log.e("Log","10");
+                //Log.e("Log","10");
                 boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                 if (retornoHorarioDaLinha) {
-                    Log.e("Log","11");
+                    //Log.e("Log","11");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                     return;
                 } else {
-                    Log.e("Log","12");
+                    //Log.e("Log","12");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(null);
                     return;
@@ -222,7 +222,8 @@ public class TaskPlayer implements Runnable {
             videoView.destroyDrawingCache();
             videoView.setVisibility(View.INVISIBLE);
             videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-            handler.postDelayed(this, 2000);
+            handler.postDelayed(this, 10000);
+
         } else {
             Log.e("Log", "Video não é nulo, Playlist = " + playlist.size());
             final String video = line.split("\\|")[3];
@@ -262,9 +263,11 @@ public class TaskPlayer implements Runnable {
                     String duracaoDoVideo = df.format(new Date(duracao));
                     registrarLog.escrever(" 02 Tocou o video: " + video + "@" + titulo + "@" + categoria + "@" + velocidade + "@" + duracaoDoVideo);
                     run();
+                    return;
                 }
             });
         }
+        Log.e("Log","Fim do executar");
     }
 
     public void setPlaylist(String line) {

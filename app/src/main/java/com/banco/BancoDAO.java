@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
 import com.Tarefas.TaskDiretorios;
 import com.bean.ComercialDependencia;
 import com.bean.ComercialDet;
@@ -105,7 +106,6 @@ public class BancoDAO {
                 listaProgramacao.add(programacaoExp);
             }
         } else {
-            Log.e("Log", "Não ha programaçoes");
             listaDeArquivos.add("semVideo");
             listaProgramacao.clear();
             return;
@@ -145,7 +145,6 @@ public class BancoDAO {
         }
 
         if(null == listaDeArquivos || !listaDeArquivos.isEmpty()){
-            Log.e("Log", "Não ha categorias");
             listaDeArquivos.add("semVideo");
             listaProgramacao.clear();
             return;
@@ -326,7 +325,6 @@ public class BancoDAO {
     }
 
     public void criarArquivoPlaylist() {
-        Log.e("Log","criarArquivoPlaylist");
         File playlistAntiga = new File(TaskDiretorios.diretorioPlaylist.concat("playlist.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();
@@ -641,7 +639,6 @@ public class BancoDAO {
     }
 
     public void criarPlaylistDeterminados() {
-        Log.e("Log", "criarPlaylistDeterminados");
         File playlistAntiga = new File(TaskDiretorios.diretorioPlaylist.concat("playlistDet.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();
