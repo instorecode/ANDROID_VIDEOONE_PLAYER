@@ -104,51 +104,53 @@ public class BancoDAO {
 
                 listaProgramacao.add(programacaoExp);
             }
-            categorias();
         } else {
+            Log.e("Log", "Não ha programaçoes");
+            listaDeArquivos.add("semVideo");
             listaProgramacao.clear();
-            listaDeArquivos.clear();
-            criarArquivoPlaylist(true);
             return;
         }
     }
 
-    protected void categorias() {
-        for (ProgramacaoExp p : listaProgramacao) {
-            codigoCategoria(p.categoria1, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria2, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria3, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria4, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria5, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria6, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria7, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria8, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria9, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria10, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria11, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria12, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria13, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria14, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria15, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria16, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria17, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria18, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria19, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria20, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria21, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria22, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria23, p.horarioInicio, p.horarioFinal);
-            codigoCategoria(p.categoria24, p.horarioInicio, p.horarioFinal);
+    public void categorias() {
+        if(null != listaProgramacao && !listaProgramacao.isEmpty()) {
+            for (ProgramacaoExp p : listaProgramacao) {
+                codigoCategoria(p.categoria1, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria2, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria3, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria4, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria5, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria6, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria7, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria8, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria9, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria10, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria11, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria12, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria13, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria14, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria15, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria16, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria17, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria18, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria19, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria20, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria21, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria22, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria23, p.horarioInicio, p.horarioFinal);
+                codigoCategoria(p.categoria24, p.horarioInicio, p.horarioFinal);
+            }
+        } else {
+            return;
         }
 
-        if (listaDeArquivos.size() == 0 || listaDeArquivos == null) {
+        if(null == listaDeArquivos || !listaDeArquivos.isEmpty()){
+            Log.e("Log", "Não ha categorias");
+            listaDeArquivos.add("semVideo");
             listaProgramacao.clear();
-            listaDeArquivos.clear();
-            criarArquivoPlaylist(true);
             return;
-        } else {
-            criarArquivoPlaylist(false);
         }
+
     }
 
     private void codigoCategoria(short codigo, String horaInicialProgramacao, String horaFinalProgramacao) {
@@ -158,7 +160,6 @@ public class BancoDAO {
             Cursor cursorT = db1.rawQuery(scriptCategoria, new String[]{});
             if (cursorT.getCount() > 0) {
                 while (cursorT.moveToNext()) {
-
                     String codigoCategoria = cursorT.getString(cursorT.getColumnIndex("Codigo"));
                     short tipoCategoria = cursorT.getShort(cursorT.getColumnIndex("Tipo"));
                     if (tipoCategoria == 1) {
@@ -324,7 +325,8 @@ public class BancoDAO {
         return null;
     }
 
-    public void criarArquivoPlaylist(boolean vazio) {
+    public void criarArquivoPlaylist() {
+        Log.e("Log","criarArquivoPlaylist");
         File playlistAntiga = new File(TaskDiretorios.diretorioPlaylist.concat("playlist.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();
@@ -346,24 +348,16 @@ public class BancoDAO {
             return;
         }
 
-        if (vazio) {
-            try {
-                fileWriter.write("semVideo");
-            } catch (IOException e) {
-                ImprimirUtils.imprimirErro(BancoDAO.this, e);
-                return;
-            }
-        } else {
-            if (null != listaDeArquivos && !listaDeArquivos.isEmpty()) {
-                for (String linha : listaDeArquivos) {
-                    try {
-                        fileWriter.write(linha.concat("\n"));
-                    } catch (IOException e) {
-                        ImprimirUtils.imprimirErro(BancoDAO.this, e);
-                        return;
-                    }
+        if (null != listaDeArquivos && !listaDeArquivos.isEmpty()) {
+            for (String linha : listaDeArquivos) {
+                try {
+                    fileWriter.write(linha.concat("\n"));
+                } catch (IOException e) {
+                    ImprimirUtils.imprimirErro(BancoDAO.this, e);
+                    return;
                 }
             }
+
         }
 
         listaDeArquivos.clear();
@@ -645,6 +639,7 @@ public class BancoDAO {
 
 
     public void criarPlaylistDeterminados() {
+        Log.e("Log", "criarPlaylistDeterminados");
         File playlistAntiga = new File(TaskDiretorios.diretorioPlaylist.concat("playlistDet.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();

@@ -18,8 +18,9 @@ public class TaskVideoAndComerciais implements Runnable {
     public void run() {
         bancoDAO = new BancoDAO(context);
         bancoDAO.programacoes();
+        bancoDAO.categorias();
+        bancoDAO.criarArquivoPlaylist();
         bancoDAO.close();
-        Toast.makeText(context, "TaskVideoAndComerciais", Toast.LENGTH_LONG).show();
         Log.e("Log", "TaskVideoAndComerciais");
     }
 }
