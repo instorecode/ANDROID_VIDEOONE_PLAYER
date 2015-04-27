@@ -21,6 +21,5 @@ public class TaskVideoAndComerciais implements Runnable {
         bancoDAO.categorias();
         bancoDAO.criarArquivoPlaylist();
         bancoDAO.close();
-        Log.e("Log", "TaskVideoAndComerciais");
     }
 }

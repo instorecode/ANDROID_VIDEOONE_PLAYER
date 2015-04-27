@@ -30,6 +30,5 @@ public class TaskLerProperties implements Runnable {
         } else {
             registrarLog.escrever(" Properties não existe TaskLerProperties");
         }
-        Toast.makeText(context, "TaskLerProperties", Toast.LENGTH_LONG).show();
     }
 }

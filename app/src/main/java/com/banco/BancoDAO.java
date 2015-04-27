@@ -189,7 +189,7 @@ public class BancoDAO {
                     listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivoDeVideo + "|0|0|" + caminhoDoArquivoDeVideo + "|" + titulo + "|" + codigoCategoria + "|" + velocidade + "|1");
                     return;
                 } else {
-                    registrarLog.escrever(" Desprezado com tipo 99. O video " + arquivo + " não foi encontrado em nenhum diretório");
+                    //registrarLog.escrever(" Desprezada com tipo 99. O video " + arquivo + " não foi encontrado em nenhum diretório");
                 }
             }
         }
@@ -240,7 +240,7 @@ public class BancoDAO {
                 }
             } else {
                 if (diaQueTocou.get(Calendar.DAY_OF_MONTH) == diaAtual.get(Calendar.DAY_OF_MONTH)) {
-                    registrarLog.escrever(" Desprezado com tipo 99. O comercial " + arquivo + " não pode ser tocado devido ter sido cadastrado como dias alternados");
+                    //registrarLog.escrever(" Desprezada com tipo 99. O comercial " + arquivo + " não pode ser tocado devido ter sido cadastrado como dias alternados");
                     return false;
                 } else {
                     boolean comercialEDependenciasExistemNosDiretoriosEBanco = validarDependenciasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria);
@@ -257,11 +257,11 @@ public class BancoDAO {
         if (!dependencia1.trim().toLowerCase().equals("nenhuma")) {
             String caminhoDoArquivo = validarExistenciaDoVideo(dependencia1);
             if (caminhoDoArquivo == null) {
-                registrarLog.escrever(" Desprezado com tipo 99. A Dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
+                //registrarLog.escrever(" Desprezada com tipo 99. A Dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
             } else {
                 ComercialDependencia cd = validarDependenciaNoBanco(dependencia1);
                 if (cd == null) {
-                    registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrada no banco");
+                   /// registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
                     listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|1|0|" + arquivo + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
@@ -271,11 +271,11 @@ public class BancoDAO {
         if (!dependencia2.trim().toLowerCase().equals("nenhuma")) {
             String caminhoDoArquivo = validarExistenciaDoVideo(dependencia2);
             if (caminhoDoArquivo == null) {
-                registrarLog.escrever(" Desprezado com tipo 99. A Dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório" + "|0|2");
+                //registrarLog.escrever(" Desprezada com tipo 99. A Dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório" + "|0|2");
             } else {
                 ComercialDependencia cd = validarDependenciaNoBanco(dependencia2);
                 if (cd == null) {
-                    registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrada no banco");
+                   // registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
                     listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|1|0|" + arquivo + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
@@ -285,11 +285,11 @@ public class BancoDAO {
         if (!dependencia3.trim().toLowerCase().equals("nenhuma")) {
             String caminhoDoArquivo = validarExistenciaDoVideo(dependencia2);
             if (caminhoDoArquivo == null) {
-                registrarLog.escrever(" Desprezado com tipo 99. A Dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
+                //registrarLog.escrever(" Desprezada com tipo 99. A Dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
             } else {
                 ComercialDependencia cd = validarDependenciaNoBanco(dependencia3);
                 if (cd == null) {
-                    registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrada no banco");
+                    //registrarLog.escrever(" 99 Desprezada com tipo. A dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
                     listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|1|0|" + arquivo + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
@@ -298,7 +298,7 @@ public class BancoDAO {
 
         String caminhoDoArquivo = validarExistenciaDoVideo(arquivo);
         if (caminhoDoArquivo == null) {
-            registrarLog.escrever(" Desprezado com tipo 99. O arquivo " + arquivo + " não foi encontrado em nenhum diretório");
+            //registrarLog.escrever(" Desprezada com tipo 99. O arquivo " + arquivo + " não foi encontrado em nenhum diretório");
         } else {
             listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|0|0|" + arquivo + "|" + titulo + "|" + codigoCategoria + "|0|2");
             return true;
@@ -482,7 +482,10 @@ public class BancoDAO {
                     semanaAndHorario(comercialDet.semana24, comercialDet.horario24, comercialDet.arquivo, comercialDet.titulo, comercialDet.categoria, comercialDet.listaDependencias, comercialDet.data);
                 }
             }
+        } else {
+           linhasPlaylistDet.add("semVideo");
         }
+
     }
 
     private ComercialDet dependenciaDeterminados(ComercialDet comercialDet) {
@@ -636,7 +639,6 @@ public class BancoDAO {
         linhasPlaylistDet.add(linha);
 
     }
-
 
     public void criarPlaylistDeterminados() {
         Log.e("Log", "criarPlaylistDeterminados");

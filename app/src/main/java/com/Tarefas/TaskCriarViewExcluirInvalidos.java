@@ -27,6 +27,5 @@ public class TaskCriarViewExcluirInvalidos implements Runnable {
         bancoDAO.excluirComercialDoBanco();
         bancoDAO.excluirVideosDoBanco();
         bancoDAO.close();
-        Toast.makeText(context, "TaskCriarViewExcluirInvalidos", Toast.LENGTH_LONG).show();
     }
 }

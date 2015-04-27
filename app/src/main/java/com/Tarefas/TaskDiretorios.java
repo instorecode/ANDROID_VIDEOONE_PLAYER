@@ -44,6 +44,5 @@ public class TaskDiretorios implements Runnable {
         this.diretorioVideoSecundario = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioSecundarioVideo()).concat(barraDoSistema);
         this.diretorioVideoTerciario = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioTerciario()).concat(barraDoSistema);
         this.diretorioPlaylist = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema);
-        Toast.makeText(context, "TaskDiretorios", Toast.LENGTH_LONG).show();
     }
 }

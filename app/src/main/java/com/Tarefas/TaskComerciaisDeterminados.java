@@ -17,14 +17,11 @@ public class TaskComerciaisDeterminados implements Runnable {
     }
 
 
-
     @Override
     public void run() {
         bancoDAO.comerciaisDeterminados();
         bancoDAO.controladorComercialDependencia();
         bancoDAO.criarPlaylistDeterminados();
         bancoDAO.close();
-        Log.e("Log", "TaskComerciaisDeterminados");
-
     }
 }
