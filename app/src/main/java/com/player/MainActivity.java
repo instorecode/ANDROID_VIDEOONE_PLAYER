@@ -49,12 +49,12 @@ public class MainActivity extends Activity {
         }
 
         final Handler handlerNormal = new Handler();
-        TaskPlayer taskPlayer = new TaskPlayer(this, handlerNormal, getApplicationContext());
+        //TaskPlayer taskPlayer = new TaskPlayer(this, handlerNormal, getApplicationContext());
         //handlerNormal.post(new TaskPlayer(this, handlerNormal,getApplicationContext()));
-        handlerNormal.post(taskPlayer);
+       // handlerNormal.post(taskPlayer);
 
-        final Handler handlerDeterminados = new Handler();
-        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer, context));
+       // final Handler handlerDeterminados = new Handler();
+       // handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer, context));
 
     }
 

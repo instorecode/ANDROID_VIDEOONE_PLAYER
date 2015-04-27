@@ -58,8 +58,6 @@ public class TaskPlayer implements Runnable {
 
     @Override
     public void run() {
-
-        Toast.makeText(context, "TaskPlayer", Toast.LENGTH_LONG).show();
         Log.e("Log", "Rodando a thread do player");
         Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
         if (playlist == null || playlist.isEmpty()) {

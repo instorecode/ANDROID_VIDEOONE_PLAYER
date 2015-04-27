@@ -25,6 +25,7 @@ public class TaskComerciaisDeterminados implements Runnable {
         bancoDAO.criarPlaylistDeterminados();
         bancoDAO.close();
         Toast.makeText(context, "TaskComerciaisDeterminados", Toast.LENGTH_LONG).show();
+        Log.e("Log", "TaskComerciaisDeterminados");
 
     }
 }

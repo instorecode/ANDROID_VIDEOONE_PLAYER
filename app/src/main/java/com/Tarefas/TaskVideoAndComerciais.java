@@ -20,5 +20,6 @@ public class TaskVideoAndComerciais implements Runnable {
         bancoDAO.programacoes();
         bancoDAO.close();
         Toast.makeText(context, "TaskVideoAndComerciais", Toast.LENGTH_LONG).show();
+        Log.e("Log", "TaskVideoAndComerciais");
     }
 }

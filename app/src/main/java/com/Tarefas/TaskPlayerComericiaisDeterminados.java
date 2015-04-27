@@ -40,8 +40,7 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
 
     @Override
     public void run() {
-        Toast.makeText(context, "TaskPlayerComericiaisDeterminados", Toast.LENGTH_LONG).show();
-        Log.e("Log", "Rodando THREAD DETERMINADO");
+      Log.e("Log", "Rodando THREAD DETERMINADO");
         controlador();
     }
 
