@@ -51,9 +51,9 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
         validarSeOComercialInterrompe(listaCapturarVideoATocar);
 
         if (listaValidarSeOComercialInterrompe != null && !listaValidarSeOComercialInterrompe.isEmpty()) {
-            for (String line : listaValidarSeOComercialInterrompe) {
-                taskPlayer.setDeterminadoAInterromper(line);
-            }
+            Log.e("Log", "listaValidarSeOComercialInterrompe");
+            //taskPlayer.executar(listaValidarSeOComercialInterrompe.get(0));
+            Log.e("Log", listaValidarSeOComercialInterrompe.size() + " TAMANHO 1");
         }
 
         if (listaValidarSeOComercialNaoInterrompe != null && !listaValidarSeOComercialNaoInterrompe.isEmpty()) {
@@ -80,16 +80,17 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
             Log.e("Log", "um minuto 1");
             handler.postDelayed(this, 60000);
         } else {
-            if (listaValidarSeOComercialInterrompe != null && !listaValidarSeOComercialInterrompe.isEmpty()) {
+            Log.e("Log", listaValidarSeOComercialInterrompe.size() + " TAMANHO 2");
+            if (listaValidarSeOComercialInterrompe.size() > 0) {
                 Log.e("Log", "um minuto 2");
                 handler.postDelayed(this, 60000);
+                listaValidarSeOComercialInterrompe.clear();
             } else {
                 Log.e("Log", "10 segundos");
                 handler.postDelayed(this, 10000);
             }
         }
 
-        listaValidarSeOComercialInterrompe.clear();
         if (null != taskPlayer.getPlaylist() && !taskPlayer.getPlaylist().isEmpty()) {
             Log.e("Log", "run TaskPlayerComericiaisDeterminados playlist SIZE = " + taskPlayer.getPlaylist().size());
         }

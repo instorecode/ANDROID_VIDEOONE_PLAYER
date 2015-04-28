@@ -106,7 +106,6 @@ public class BancoDAO {
                 listaProgramacao.add(programacaoExp);
             }
         } else {
-            listaDeArquivos.add("semVideo");
             listaProgramacao.clear();
             return;
         }
@@ -144,7 +143,7 @@ public class BancoDAO {
             return;
         }
 
-        if(null == listaDeArquivos || !listaDeArquivos.isEmpty()){
+        if(null == listaDeArquivos || listaDeArquivos.isEmpty()){
             listaDeArquivos.add("semVideo");
             listaProgramacao.clear();
             return;

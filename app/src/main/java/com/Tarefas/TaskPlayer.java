@@ -33,7 +33,6 @@ import java.util.TimeZone;
 
 public class TaskPlayer implements Runnable {
 
-    public List<String> determinadoAInterromper = new ArrayList<String>();
     private MainActivity main;
     private Handler handler;
     private VideoView videoView;
@@ -41,13 +40,14 @@ public class TaskPlayer implements Runnable {
     private Context context;
     private RegistrarLog registrarLog;
     private File arquivoVideo = null;
-    public  List<String> playlist = new ArrayList<String>();
+    public List<String> playlist = new ArrayList<String>();
     private final String barraDoSistema = System.getProperty("file.separator");
     private final String caminho = Environment.getExternalStorageDirectory().toString();
     private boolean videoVazio = true;
     private int duracao = 60000;
 
-    public TaskPlayer(){}
+    public TaskPlayer() {
+    }
 
     public TaskPlayer(MainActivity mainActivity, Handler handler, Context context) {
         this.main = mainActivity;
@@ -59,33 +59,33 @@ public class TaskPlayer implements Runnable {
     @Override
     public void run() {
         Log.e("Log", "Rodando a thread do player");
-        //Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
+        Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
         if (playlist == null || playlist.isEmpty()) {
-            //Log.e("Log","1");
+            Log.e("Log", "1");
             lerLinhas();
             if (videoVazio) {
-                //Log.e("Log","2");
+                Log.e("Log", "2");
                 executar(null);
                 return;
             } else {
-                //Log.e("Log","3");
+                Log.e("Log", "3");
                 String linha = playlist.get(0);
                 String flag = linha.split("\\|")[0];
-                if(flag.equals("det") || flag.contains("det")){
-                    //Log.e("Log","4");
+                if (flag.equals("det") || flag.contains("det")) {
+                    Log.e("Log", "4");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                     return;
                 } else {
-                  //  Log.e("Log","5");
+                    Log.e("Log", "5");
                     boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                     if (retornoHorarioDaLinha) {
-                //        Log.e("Log","6");
+                        Log.e("Log", "6");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(linha);
                         return;
                     } else {
-              //          Log.e("Log","7");
+                        Log.e("Log", "7");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(null);
                         return;
@@ -93,24 +93,24 @@ public class TaskPlayer implements Runnable {
                 }
             }
         } else {
-            //Log.e("Log","8");
+            Log.e("Log", "8");
             String linha = playlist.get(0);
             String flag = linha.split("\\|")[0];
-            if(flag.equals("det") || flag.contains("det")) {
-                //Log.e("Log","9");
+            if (flag.equals("det") || flag.contains("det")) {
+                Log.e("Log", "9");
                 playlist = new ArrayList(playlist.subList(1, playlist.size()));
                 executar(linha);
                 return;
             } else {
-                //Log.e("Log","10");
+                Log.e("Log", "10");
                 boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                 if (retornoHorarioDaLinha) {
-                    //Log.e("Log","11");
+                    Log.e("Log", "11");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                     return;
                 } else {
-                    //Log.e("Log","12");
+                    Log.e("Log", "12");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(null);
                     return;
@@ -207,16 +207,34 @@ public class TaskPlayer implements Runnable {
         return true;
     }
 
-    private void executar(String line) {
-        Log.e("Log","Executar");
-        if(determinadoAInterromper != null && !determinadoAInterromper.isEmpty()){
-            line = determinadoAInterromper.get(0);
-            for(String linha : determinadoAInterromper){
-                Log.e("Log", linha + " Determinado a interromper");
-            }
-            determinadoAInterromper = determinadoAInterromper.subList(1,determinadoAInterromper.size());
-        }
+    public void determinado(List<String> lista) {
+        if (lista != null && !lista.isEmpty()) {
+            String linha = lista.get(0);
+            Log.e("Log", lista.size() + "");
+            Log.e("Log", linha + " Determinado a interromper");
 
+            if (videoView.isPlaying()) {
+                Log.e("Log", "O VIDEO ESTA TOCANDO");
+                videoView.stopPlayback();
+                videoView.pause();
+                videoView.clearAnimation();
+                videoView.clearFocus();
+                videoView.destroyDrawingCache();
+                videoView.setVisibility(View.INVISIBLE);
+                videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+
+                executar(linha);
+
+            } else {
+                Log.e("Log", "O VIDEO NÃO ESTA TOCANDO");
+                executar(linha);
+                return;
+            }
+        }
+    }
+
+    public void executar(String line) {
+        Log.e("Log", "Executar");
         if (null == line) {
             videoView = (VideoView) main.findViewById(R.id.video);
             videoView.destroyDrawingCache();
@@ -225,6 +243,7 @@ public class TaskPlayer implements Runnable {
             handler.postDelayed(this, 10000);
 
         } else {
+
             Log.e("Log", "Video não é nulo, Playlist = " + playlist.size());
             final String video = line.split("\\|")[3];
             final String titulo = line.split("\\|")[7];
@@ -244,15 +263,11 @@ public class TaskPlayer implements Runnable {
                 public void onPrepared(MediaPlayer mp) {
                     duracao = videoView.getDuration();
                     Log.e("Log", "Esta tocando o video " + arquivoVideo);
-                    Toast.makeText(context, arquivoVideo + "", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, arquivoVideo + " " + new SimpleDateFormat("HH:mm:ss").format(new Date()), Toast.LENGTH_LONG).show();
                     bancoDAO.atualizarBanco(arquivoVideo, duracao, tipoCategoria);
                     bancoDAO.close();
                     videoView.requestFocus();
                     videoView.start();
-                    /*String flag = line.split("\\|")[0];
-                    if(!flag.equals("det") || !flag.contains("det")) {
-                       new TaskVideoAndComerciais(context);
-                    }*/
                 }
             });
 
@@ -267,7 +282,7 @@ public class TaskPlayer implements Runnable {
                 }
             });
         }
-        Log.e("Log","Fim do executar");
+        Log.e("Log", "Fim do executar");
     }
 
     public void setPlaylist(String line) {
@@ -276,14 +291,6 @@ public class TaskPlayer implements Runnable {
 
     public List<String> getPlaylist() {
         return playlist;
-    }
-
-    public void setDeterminadoAInterromper(String line){
-        this.determinadoAInterromper.add(line);
-    }
-
-    public List<String> getDeterminadoAInterromper(){
-        return determinadoAInterromper;
     }
 
 
