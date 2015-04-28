@@ -60,7 +60,7 @@ public class TaskPlayer implements Runnable {
     public void run() {
         Log.e("Log", "Rodando a thread do player");
         Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
-        if (playlist == null || playlist.isEmpty()) {
+        if (playlist == null || playlist.isEmpty() || playlist.size()  == 0) {
             Log.e("Log", "1");
             lerLinhas();
             if (videoVazio) {
@@ -133,7 +133,7 @@ public class TaskPlayer implements Runnable {
             String line = "";
             try {
                 while (null != (line = bf.readLine())) {
-                    if (line.contains("semVideo") || line.equals("semVideo")) {
+                    if (line.contains("semVideo") && line.equals("semVideo")) {
                         videoVazio = true;
                         break;
                     } else {
@@ -210,26 +210,15 @@ public class TaskPlayer implements Runnable {
     public void determinado(List<String> lista) {
         if (lista != null && !lista.isEmpty()) {
             String linha = lista.get(0);
-            Log.e("Log", lista.size() + "");
             Log.e("Log", linha + " Determinado a interromper");
-
-            if (videoView.isPlaying()) {
-                Log.e("Log", "O VIDEO ESTA TOCANDO");
-                videoView.stopPlayback();
-                videoView.pause();
-                videoView.clearAnimation();
-                videoView.clearFocus();
-                videoView.destroyDrawingCache();
-                videoView.setVisibility(View.INVISIBLE);
-                videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-
-                executar(linha);
-
-            } else {
-                Log.e("Log", "O VIDEO NÃO ESTA TOCANDO");
-                executar(linha);
-                return;
-            }
+            videoView.stopPlayback();
+            videoView.pause();
+            videoView.clearAnimation();
+            videoView.clearFocus();
+            videoView.destroyDrawingCache();
+            videoView.setVisibility(View.INVISIBLE);
+            videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+            executar(linha);
         }
     }
 
@@ -240,7 +229,7 @@ public class TaskPlayer implements Runnable {
             videoView.destroyDrawingCache();
             videoView.setVisibility(View.INVISIBLE);
             videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-            handler.postDelayed(this, 10000);
+            handler.postDelayed(this, 1000);
 
         } else {
 

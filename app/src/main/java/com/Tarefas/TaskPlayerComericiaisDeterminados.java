@@ -52,7 +52,7 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
 
         if (listaValidarSeOComercialInterrompe != null && !listaValidarSeOComercialInterrompe.isEmpty()) {
             Log.e("Log", "listaValidarSeOComercialInterrompe");
-            //taskPlayer.executar(listaValidarSeOComercialInterrompe.get(0));
+            taskPlayer.determinado(listaValidarSeOComercialInterrompe);
             Log.e("Log", listaValidarSeOComercialInterrompe.size() + " TAMANHO 1");
         }
 
@@ -61,13 +61,15 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
                 listaDeterminados.add(line);
             }
             listaValidarSeOComercialNaoInterrompe.clear();
-        }
 
-        if (taskPlayer.getPlaylist() != null && !taskPlayer.getPlaylist().isEmpty()) {
-            for (String line : taskPlayer.getPlaylist()) {
-                listaDeterminados.add(line);
+            if (taskPlayer.getPlaylist() != null && !taskPlayer.getPlaylist().isEmpty()) {
+                for (String line : taskPlayer.getPlaylist()) {
+                    listaDeterminados.add(line);
+                }
             }
         }
+
+
 
         if (listaDeterminados != null && !listaDeterminados.isEmpty()) {
             taskPlayer.getPlaylist().clear();
@@ -80,20 +82,17 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
             Log.e("Log", "um minuto 1");
             handler.postDelayed(this, 60000);
         } else {
-            Log.e("Log", listaValidarSeOComercialInterrompe.size() + " TAMANHO 2");
             if (listaValidarSeOComercialInterrompe.size() > 0) {
                 Log.e("Log", "um minuto 2");
                 handler.postDelayed(this, 60000);
                 listaValidarSeOComercialInterrompe.clear();
+                Log.e("Log", listaValidarSeOComercialInterrompe.size() + " TAMANHO 2");
             } else {
                 Log.e("Log", "10 segundos");
                 handler.postDelayed(this, 10000);
             }
         }
 
-        if (null != taskPlayer.getPlaylist() && !taskPlayer.getPlaylist().isEmpty()) {
-            Log.e("Log", "run TaskPlayerComericiaisDeterminados playlist SIZE = " + taskPlayer.getPlaylist().size());
-        }
         listaDeterminados.clear();
     }
 
@@ -105,6 +104,7 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
                     listaValidarSeOComercialNaoInterrompe.add(comercial);
                 } else {
                     listaValidarSeOComercialInterrompe.add(comercial);
+                    break;
                 }
             }
         }

@@ -105,13 +105,15 @@ public class BancoDAO {
 
                 listaProgramacao.add(programacaoExp);
             }
+            categorias();
         } else {
             listaProgramacao.clear();
+            listaDeArquivos.add("semVideo");
             return;
         }
     }
 
-    public void categorias() {
+    private void categorias() {
         if(null != listaProgramacao && !listaProgramacao.isEmpty()) {
             for (ProgramacaoExp p : listaProgramacao) {
                 codigoCategoria(p.categoria1, p.horarioInicio, p.horarioFinal);

@@ -18,7 +18,6 @@ public class TaskVideoAndComerciais implements Runnable {
     public void run() {
         bancoDAO = new BancoDAO(context);
         bancoDAO.programacoes();
-        bancoDAO.categorias();
         bancoDAO.criarArquivoPlaylist();
         bancoDAO.close();
     }
