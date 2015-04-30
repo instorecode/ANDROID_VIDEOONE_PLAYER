@@ -60,6 +60,7 @@ public class TaskPlayer implements Runnable {
     public void run() {
         Log.e("Log", "Rodando a thread do player");
         Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
+        Toast.makeText(context, playlist.size() + "", Toast.LENGTH_SHORT).show();
         if (playlist == null || playlist.isEmpty() || playlist.size()  == 0) {
             Log.e("Log", "1");
             lerLinhas();
@@ -210,7 +211,6 @@ public class TaskPlayer implements Runnable {
     public void determinado(List<String> lista) {
         if (lista != null && !lista.isEmpty()) {
             String linha = lista.get(0);
-            Log.e("Log", linha + " Determinado a interromper");
             videoView.stopPlayback();
             videoView.pause();
             videoView.clearAnimation();

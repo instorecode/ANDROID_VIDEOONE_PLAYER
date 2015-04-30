@@ -27,6 +27,7 @@ public class TaskLerProperties implements Runnable {
         File properties = new File(caminhoProperties);
         if (properties.exists()) {
             ConfiguaracaoUtils.lerProperties(caminho.concat(barraDoSistema).concat("videoOne").concat(barraDoSistema).concat("config").concat(barraDoSistema).concat("configuracoes.properties"));
+            registrarLog.escrever(" Ok");
         } else {
             registrarLog.escrever(" Properties não existe TaskLerProperties");
         }
