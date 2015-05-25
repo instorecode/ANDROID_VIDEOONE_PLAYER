@@ -4,17 +4,15 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Environment;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import android.widget.VideoView;
-
 import com.banco.BancoDAO;
 import com.br.instore.utils.ConfiguaracaoUtils;
-import com.br.instore.utils.ImprimirUtils;
+import com.br.instore.utils.LogUtils;
 import com.player.MainActivity;
 import com.player.R;
-import com.utils.RegistrarLog;
+import com.utils.AndroidImprimirUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,7 +37,6 @@ public class TaskPlayer implements Runnable {
     private VideoView videoView;
     private BancoDAO bancoDAO;
     private Context context;
-    private RegistrarLog registrarLog;
     private File arquivoVideo = null;
     public List<String> playlist = new ArrayList<String>();
     private final String barraDoSistema = System.getProperty("file.separator");
@@ -46,47 +44,35 @@ public class TaskPlayer implements Runnable {
     private boolean videoVazio = true;
     private int duracao = 60000;
 
-    public TaskPlayer() {
-    }
 
     public TaskPlayer(MainActivity mainActivity, Handler handler, Context context) {
         this.main = mainActivity;
         this.handler = handler;
         this.context = context;
-        this.registrarLog = new RegistrarLog(context);
     }
 
     @Override
     public void run() {
-        Log.e("Log", "Rodando a thread do player");
-        Log.e("Log", "TaskPlayer playlist SIZE = " + playlist.size());
         Toast.makeText(context, playlist.size() + "", Toast.LENGTH_SHORT).show();
         if (playlist == null || playlist.isEmpty() || playlist.size()  == 0) {
-            Log.e("Log", "1");
             lerLinhas();
             if (videoVazio) {
-                Log.e("Log", "2");
                 executar(null);
                 return;
             } else {
-                Log.e("Log", "3");
                 String linha = playlist.get(0);
                 String flag = linha.split("\\|")[0];
                 if (flag.equals("det") || flag.contains("det")) {
-                    Log.e("Log", "4");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                     return;
                 } else {
-                    Log.e("Log", "5");
                     boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                     if (retornoHorarioDaLinha) {
-                        Log.e("Log", "6");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(linha);
                         return;
                     } else {
-                        Log.e("Log", "7");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(null);
                         return;
@@ -94,24 +80,19 @@ public class TaskPlayer implements Runnable {
                 }
             }
         } else {
-            Log.e("Log", "8");
             String linha = playlist.get(0);
             String flag = linha.split("\\|")[0];
             if (flag.equals("det") || flag.contains("det")) {
-                Log.e("Log", "9");
                 playlist = new ArrayList(playlist.subList(1, playlist.size()));
                 executar(linha);
                 return;
             } else {
-                Log.e("Log", "10");
                 boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
                 if (retornoHorarioDaLinha) {
-                    Log.e("Log", "11");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(linha);
                     return;
                 } else {
-                    Log.e("Log", "12");
                     playlist = new ArrayList(playlist.subList(1, playlist.size()));
                     executar(null);
                     return;
@@ -128,8 +109,15 @@ public class TaskPlayer implements Runnable {
             try {
                 fileReader = new FileReader(arquivoPlaylist);
             } catch (FileNotFoundException e) {
-                ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
             }
+
             BufferedReader bf = new BufferedReader(fileReader);
             String line = "";
             try {
@@ -143,19 +131,48 @@ public class TaskPlayer implements Runnable {
                     }
                 }
             } catch (IOException e) {
-                ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
                 return;
             } finally {
                 try {
                     bf.close();
                 } catch (IOException e) {
-                    ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    return;
+                } catch (NullPointerException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    return;
+                } catch (InvalidParameterException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    return;
+                } catch (Exception e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
                     return;
                 }
+
                 try {
                     fileReader.close();
                 } catch (IOException e) {
-                    ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    return;
+                } catch (NullPointerException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    return;
+                } catch (InvalidParameterException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                    return;
+                } catch (Exception e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
                     return;
                 }
             }
@@ -163,26 +180,65 @@ public class TaskPlayer implements Runnable {
             try {
                 arquivoPlaylist.createNewFile();
             } catch (IOException e) {
-                ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
                 return;
             }
+
             FileWriter fileWriter = null;
             try {
                 fileWriter = new FileWriter(arquivoPlaylist, true);
             } catch (IOException e) {
-                ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
                 return;
             }
+
             try {
                 fileWriter.write("semVideo");
             } catch (IOException e) {
-                ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
                 return;
             }
+
             try {
                 fileWriter.close();
             } catch (IOException e) {
-                ImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                return;
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
                 return;
             }
         }
@@ -196,12 +252,23 @@ public class TaskPlayer implements Runnable {
             horaInicialProgramação = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss").parse(dataAtual.concat(horaInicial));
             horaFinalProgramacao = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss").parse(dataAtual.concat(horaFinal));
         } catch (ParseException e) {
-            ImprimirUtils.imprimirErro(ConfiguaracaoUtils.class, e);
+            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+            return false;
+        } catch (NullPointerException e) {
+            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+            return false;
+        } catch (InvalidParameterException e) {
+            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+            return false;
+        } catch (Exception e) {
+            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
             return false;
         }
+
         if (horaFinalProgramacao.before(new Date())) {
             return false;
         }
+
         if (horaInicialProgramação.after(new Date())) {
             return false;
         }
@@ -223,7 +290,6 @@ public class TaskPlayer implements Runnable {
     }
 
     public void executar(String line) {
-        Log.e("Log", "Executar");
         if (null == line) {
             videoView = (VideoView) main.findViewById(R.id.video);
             videoView.destroyDrawingCache();
@@ -232,8 +298,6 @@ public class TaskPlayer implements Runnable {
             handler.postDelayed(this, 1000);
 
         } else {
-
-            Log.e("Log", "Video não é nulo, Playlist = " + playlist.size());
             final String video = line.split("\\|")[3];
             final String titulo = line.split("\\|")[7];
             final String categoria = line.split("\\|")[8];
@@ -251,7 +315,6 @@ public class TaskPlayer implements Runnable {
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 public void onPrepared(MediaPlayer mp) {
                     duracao = videoView.getDuration();
-                    Log.e("Log", "Esta tocando o video " + arquivoVideo);
                     Toast.makeText(context, arquivoVideo + " " + new SimpleDateFormat("HH:mm:ss").format(new Date()), Toast.LENGTH_LONG).show();
                     bancoDAO.atualizarBanco(arquivoVideo, duracao, tipoCategoria);
                     bancoDAO.close();
@@ -265,13 +328,12 @@ public class TaskPlayer implements Runnable {
                     DateFormat df = new SimpleDateFormat("HH:mm:ss");
                     df.setTimeZone(TimeZone.getTimeZone("GMT+0"));
                     String duracaoDoVideo = df.format(new Date(duracao));
-                    registrarLog.escrever(" 02 Tocou o video: " + video + "@" + titulo + "@" + categoria + "@" + velocidade + "@" + duracaoDoVideo);
+                    LogUtils.registrar(02, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 02 Tocou o video: " + video + "@" + titulo + "@" + categoria + "@" + velocidade + "@" + duracaoDoVideo);
                     run();
                     return;
                 }
             });
         }
-        Log.e("Log", "Fim do executar");
     }
 
     public void setPlaylist(String line) {

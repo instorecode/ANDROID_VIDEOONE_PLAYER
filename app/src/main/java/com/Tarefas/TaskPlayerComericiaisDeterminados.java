@@ -3,16 +3,15 @@ package com.Tarefas;
 import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
-import android.util.Log;
-import android.widget.Toast;
-
 import com.br.instore.utils.ConfiguaracaoUtils;
-import com.br.instore.utils.ImprimirUtils;
+import com.utils.AndroidImprimirUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +39,6 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
 
     @Override
     public void run() {
-        Log.e("Log", "Rodando THREAD DETERMINADO");
         controlador();
     }
 
@@ -51,9 +49,7 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
         validarSeOComercialInterrompe(listaCapturarVideoATocar);
 
         if (listaValidarSeOComercialInterrompe != null && !listaValidarSeOComercialInterrompe.isEmpty()) {
-            Log.e("Log", "listaValidarSeOComercialInterrompe");
             taskPlayer.determinado(listaValidarSeOComercialInterrompe);
-            Log.e("Log", listaValidarSeOComercialInterrompe.size() + " TAMANHO 1");
         }
 
         if (listaValidarSeOComercialNaoInterrompe != null && !listaValidarSeOComercialNaoInterrompe.isEmpty()) {
@@ -69,8 +65,6 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
             }
         }
 
-
-
         if (listaDeterminados != null && !listaDeterminados.isEmpty()) {
             taskPlayer.getPlaylist().clear();
             for (String line : listaDeterminados) {
@@ -79,16 +73,12 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
                 }
             }
             listaDeterminados.clear();
-            Log.e("Log", "um minuto 1");
             handler.postDelayed(this, 60000);
         } else {
             if (listaValidarSeOComercialInterrompe.size() > 0) {
-                Log.e("Log", "um minuto 2");
                 handler.postDelayed(this, 60000);
                 listaValidarSeOComercialInterrompe.clear();
-                Log.e("Log", listaValidarSeOComercialInterrompe.size() + " TAMANHO 2");
             } else {
-                Log.e("Log", "10 segundos");
                 handler.postDelayed(this, 10000);
             }
         }
@@ -134,8 +124,15 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
             try {
                 fileReader = new FileReader(arquivoPlaylistDet);
             } catch (FileNotFoundException e) {
-                ImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
             }
+
             BufferedReader bf = new BufferedReader(fileReader);
             String line = "";
             try {
@@ -148,17 +145,35 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
                     }
                 }
             } catch (IOException e) {
-                ImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
             } finally {
                 try {
                     bf.close();
                 } catch (IOException e) {
-                    ImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                 } catch (NullPointerException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                } catch (InvalidParameterException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                } catch (Exception e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
                 }
                 try {
                     fileReader.close();
-                } catch (IOException e) {
-                    ImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e);
+                } catch (FileNotFoundException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                } catch (NullPointerException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                } catch (InvalidParameterException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                } catch (Exception e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
                 }
             }
         }

@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.banco.BancoDAO;
+import com.utils.RegistrarLog;
 
 import java.io.File;
 
@@ -27,5 +28,6 @@ public class TaskCriarViewExcluirInvalidos implements Runnable {
         bancoDAO.excluirComercialDoBanco();
         bancoDAO.excluirVideosDoBanco();
         bancoDAO.close();
+        RegistrarLog.imprimirMsg("Log", "TaskCriarViewExcluirInvalidos");
     }
 }

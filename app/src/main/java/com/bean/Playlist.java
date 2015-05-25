@@ -11,7 +11,6 @@ public class Playlist {
     private String categoria;
     private String velocidade;
 
-
     public String getHoraInicialProgramacao() {
         return horaInicialProgramacao;
     }

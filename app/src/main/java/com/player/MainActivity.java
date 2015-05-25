@@ -8,13 +8,15 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+
+import com.Tarefas.TarefaComunicao;
 import com.Tarefas.TaskComerciaisDeterminados;
 import com.Tarefas.TaskCriarViewExcluirInvalidos;
-import com.Tarefas.TaskDiretorios;
 import com.Tarefas.TaskLerProperties;
 import com.Tarefas.TaskPlayer;
 import com.Tarefas.TaskPlayerComericiaisDeterminados;
 import com.Tarefas.TaskVideoAndComerciais;
+import com.utils.AndroidImprimirUtils;
 
 public class MainActivity extends Activity {
     private Context context;
@@ -26,16 +28,19 @@ public class MainActivity extends Activity {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         context = getApplicationContext();
 
-        ScheduledExecutorService thread1 = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService thread2 = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService thread3 = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService thread4 = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService thread5 = Executors.newScheduledThreadPool(1);
-        thread1.scheduleAtFixedRate(new TaskLerProperties(context), 0, 10, TimeUnit.SECONDS);
-        thread2.scheduleAtFixedRate(new TaskDiretorios(context), 500, 10000, TimeUnit.MILLISECONDS);
-        thread3.scheduleAtFixedRate(new TaskCriarViewExcluirInvalidos(context), 600, 3600000, TimeUnit.MILLISECONDS);
-        thread4.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 700, 30000, TimeUnit.MILLISECONDS);
-        thread5.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 700, 30000, TimeUnit.MILLISECONDS);
+        ScheduledExecutorService lerProperties = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService criarViewExcluirVencidos = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService threadComunicacaoNormal = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService threadComunicacaoEmergencia = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService criarPlayListDeterminados = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService criarPlayListNormal = Executors.newScheduledThreadPool(1);
+
+        lerProperties.scheduleAtFixedRate(new TaskLerProperties(context), 0, 10, TimeUnit.SECONDS);
+        criarViewExcluirVencidos.scheduleAtFixedRate(new TaskCriarViewExcluirInvalidos(context), 0, 24, TimeUnit.HOURS);
+        threadComunicacaoNormal.scheduleAtFixedRate(new TarefaComunicao(context), 2, 30, TimeUnit.SECONDS);
+        threadComunicacaoEmergencia.scheduleAtFixedRate(new TarefaComunicao(context), 5, 1800, TimeUnit.SECONDS);
+        criarPlayListDeterminados.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 700, 30000, TimeUnit.MILLISECONDS);
+        criarPlayListNormal.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 700, 30000, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -45,7 +50,7 @@ public class MainActivity extends Activity {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            AndroidImprimirUtils.imprimirErro(MainActivity.this, e);
         }
 
         final Handler handlerNormal = new Handler();

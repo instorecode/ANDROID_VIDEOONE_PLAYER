@@ -1,5 +1,6 @@
 package com.banco;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
@@ -8,17 +9,19 @@ import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteReadOnlyDatabaseException;
 import android.os.Environment;
-import android.util.Log;
 import com.bean.ComercialDependencia;
 import com.bean.ComercialDet;
+import com.br.instore.exp.bean.CategoriaExp;
+import com.br.instore.exp.bean.ComercialExp;
 import com.br.instore.exp.bean.ProgramacaoExp;
+import com.br.instore.exp.bean.VideoExp;
 import com.br.instore.utils.Banco;
 import com.br.instore.utils.ConfiguaracaoUtils;
 import com.br.instore.utils.DataUtils;
+import com.br.instore.utils.ExpUtils;
 import com.br.instore.utils.LogUtils;
 import com.br.instore.utils.StringUtils;
 import com.utils.AndroidImprimirUtils;
-import com.utils.RegistrarLog;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,16 +37,19 @@ import java.util.Random;
 import java.util.TimeZone;
 
 public class BancoDAO {
-    private static final String VIEW_PROGRAMACAO = "SELECT * FROM VIEW_CARREGAR_PROGRAMACAO";
+
     private List<ProgramacaoExp> listaProgramacao = new ArrayList<ProgramacaoExp>();
     private List<String> listaDeArquivos = new ArrayList<String>();
     private List<ComercialDet> listaComercialDeterminados = new ArrayList<ComercialDet>();
     private List<String> linhasPlaylistDet = new ArrayList<String>();
+
     private Banco banco = new Banco();
+    private ExpUtils expUtils = new ExpUtils();
     private Cursor cursor;
     private DatabaseHelper helper;
     private SQLiteDatabase db;
 
+    private static final String VIEW_PROGRAMACAO = "SELECT * FROM VIEW_CARREGAR_PROGRAMACAO";
     private final String barraDoSistema = System.getProperty("file.separator");
     private String caminho = Environment.getExternalStorageDirectory().toString();
 
@@ -1186,6 +1192,7 @@ public class BancoDAO {
         }
     }
 
+    //------- CRIAR AS VIEW ---////
     public void criarViewProgramacao() {
         try {
             SQLiteDatabase db = helper.getWritableDatabase();
@@ -1274,21 +1281,67 @@ public class BancoDAO {
         }
     }
 
+    //---- QUANTIDADE DE COMERCIAIS E VIDEOS NO BANCO ----------------------------------------------------------------------------------///
     public String quantidadeComerciaisNoBanco() {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT Arquivo FROM Comercial", new String[]{});
         String comerciaisNoBanco = "";
-        comerciaisNoBanco = String.valueOf(cursor.getCount());
-        cursor.close();
+        try {
+            SQLiteDatabase db = helper.getWritableDatabase();
+            cursor = db.rawQuery("SELECT Arquivo FROM Comercial", new String[]{});
+            comerciaisNoBanco = String.valueOf(cursor.getCount());
+        } catch (SQLiteCantOpenDatabaseException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return comerciaisNoBanco;
+        } catch (SQLiteReadOnlyDatabaseException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return comerciaisNoBanco;
+        } catch (SQLiteDatabaseCorruptException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return comerciaisNoBanco;
+        } catch (SQLiteDatabaseLockedException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return comerciaisNoBanco;
+        } catch (NullPointerException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return comerciaisNoBanco;
+        } catch (InvalidParameterException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return comerciaisNoBanco;
+        } catch (Exception e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return comerciaisNoBanco;
+        }
         return comerciaisNoBanco;
     }
 
     public String quantidadeVideoNoBanco() {
-        SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT Arquivo FROM Video", new String[]{});
         String videoNoBanco = "";
-        videoNoBanco = String.valueOf(cursor.getCount());
-        cursor.close();
+        try {
+            SQLiteDatabase db = getDb();
+            cursor = db.rawQuery("SELECT Arquivo FROM Video", new String[]{});
+            videoNoBanco = String.valueOf(cursor.getCount());
+        } catch (SQLiteCantOpenDatabaseException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return videoNoBanco;
+        } catch (SQLiteReadOnlyDatabaseException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return videoNoBanco;
+        } catch (SQLiteDatabaseCorruptException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return videoNoBanco;
+        } catch (SQLiteDatabaseLockedException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return videoNoBanco;
+        } catch (NullPointerException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return videoNoBanco;
+        } catch (InvalidParameterException e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return videoNoBanco;
+        } catch (Exception e) {
+            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+            return videoNoBanco;
+        }
+
         return videoNoBanco;
     }
 
@@ -1425,5 +1478,286 @@ public class BancoDAO {
             return valor;
         }
         return valor;
+    }
+
+    //---------------------------POPULAR O BANCO APOS COMUNICACAO ---------------------------------------------------------------------//
+    public void insertCategoria(String caminho) {
+        db = helper.getWritableDatabase();
+        db.beginTransaction();
+        if (null != caminho && !caminho.trim().replaceAll("\\s", "").isEmpty()) {
+            try {
+                List<CategoriaExp> listaCategoria = expUtils.lerCategoria(caminho);
+                if(null != listaCategoria && listaCategoria.size() > 0) {
+                    for (CategoriaExp c : listaCategoria) {
+                        try {
+                            ContentValues values = new ContentValues();
+                            values.put("Codigo", c.codigo);
+                            values.put("Categoria", c.categoria.trim());
+                            values.put("DataInicio", c.dataInicial);
+                            values.put("DataFinal", c.dataFinal);
+                            values.put("Tipo", c.tipo);
+                            values.put("Tempo", c.tempo);
+                            db.replace("Categoria", null, values);
+                        } catch (SQLiteCantOpenDatabaseException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteReadOnlyDatabaseException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteDatabaseCorruptException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteDatabaseLockedException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (NullPointerException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (InvalidParameterException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (Exception e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } finally {
+                db.endTransaction();
+            }
+        }
+    }
+
+    public void insertComercial(String caminho) {
+        db = helper.getWritableDatabase();
+        db.beginTransaction();
+        if (null != caminho && !caminho.trim().replaceAll("\\s", "").isEmpty()) {
+            try {
+                List<ComercialExp> listaComercial = expUtils.lerComercial(caminho);
+                if(null != listaComercial && listaComercial.size() > 0) {
+                    for (ComercialExp c : listaComercial) {
+                        try {
+                            ContentValues values = new ContentValues();
+                            values.put("Arquivo", c.arquivo.trim());
+                            values.put("Cliente", c.cliente.trim());
+                            values.put("Titulo", c.titulo.trim());
+                            values.put("TipoInterprete", c.tipoInterprete);
+                            values.put("Categoria", c.categoria);
+                            values.put("PeriodoInicial", c.dataInicial);
+                            values.put("PeriodoFinal", c.dataFinal);
+                            db.replace("Comercial", null, values);
+                        } catch (SQLiteCantOpenDatabaseException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteReadOnlyDatabaseException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteDatabaseCorruptException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteDatabaseLockedException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (NullPointerException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (InvalidParameterException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (Exception e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } finally {
+                db.endTransaction();
+            }
+        }
+    }
+
+    public void insertProgramacao(String caminho) {
+        db = helper.getWritableDatabase();
+        db.beginTransaction();
+        if (null != caminho && !caminho.trim().replaceAll("\\s", "").isEmpty()) {
+            try {
+                List<ProgramacaoExp> listaProgramacoes = expUtils.lerProgramacao(caminho);
+                if(null != listaProgramacoes && listaProgramacoes.size() > 0) {
+                    for (ProgramacaoExp p : listaProgramacoes) {
+                        try {
+                            ContentValues values = new ContentValues();
+                            values.put("Descricao", p.descricao.trim());
+                            values.put("Dia", p.dataInicial.split("-")[0]);
+                            values.put("Mes", p.dataInicial.split("-")[1]);
+                            values.put("Ano", p.dataInicial.split("-")[2]);
+                            values.put("Diaf", p.dataFinal.split("-")[0]);
+                            values.put("Mesf", p.dataFinal.split("-")[1]);
+                            values.put("Anof", p.dataFinal.split("-")[2]);
+                            values.put("DiaSemana", p.diaDaSemana);
+                            values.put("HoraInicio", p.horarioInicio);
+                            values.put("HoraFinal", p.horarioFinal);
+                            values.put("Categoria1", p.categoria1);
+                            values.put("Categoria2", p.categoria2);
+                            values.put("Categoria3", p.categoria3);
+                            values.put("Categoria4", p.categoria4);
+                            values.put("Categoria5", p.categoria5);
+                            values.put("Categoria6", p.categoria6);
+                            values.put("Categoria7", p.categoria7);
+                            values.put("Categoria8", p.categoria8);
+                            values.put("Categoria9", p.categoria9);
+                            values.put("Categoria10", p.categoria10);
+                            values.put("Categoria11", p.categoria11);
+                            values.put("Categoria12", p.categoria12);
+                            values.put("Categoria13", p.categoria13);
+                            values.put("Categoria14", p.categoria14);
+                            values.put("Categoria15", p.categoria15);
+                            values.put("Categoria16", p.categoria16);
+                            values.put("Categoria17", p.categoria17);
+                            values.put("Categoria18", p.categoria18);
+                            values.put("Categoria19", p.categoria19);
+                            values.put("Categoria20", p.categoria20);
+                            values.put("Categoria21", p.categoria21);
+                            values.put("Categoria22", p.categoria22);
+                            values.put("Categoria23", p.categoria23);
+                            values.put("Categoria24", p.categoria24);
+                            values.put("Conteudo", p.conteudo);
+                            db.replace("Programacao", null, values);
+
+                        } catch (SQLiteCantOpenDatabaseException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteReadOnlyDatabaseException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteDatabaseCorruptException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteDatabaseLockedException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (NullPointerException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (InvalidParameterException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (Exception e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } finally {
+                db.endTransaction();
+            }
+        }
+    }
+
+    public void insertVideo(String caminho) {
+        db = helper.getWritableDatabase();
+        db.beginTransaction();
+        if (null != caminho && !caminho.trim().replaceAll("\\s", "").isEmpty()) {
+            try {
+                List<VideoExp> listaVideos = expUtils.lerVideo(caminho);
+                if(null != listaVideos && listaVideos.size() > 0) {
+                    for (VideoExp v : listaVideos) {
+                        try {
+                            ContentValues values = new ContentValues();
+                            values.put("Arquivo", v.arquivo.trim());
+                            values.put("Interprete", v.interprete.trim());
+                            values.put("TipoInterprete", v.tipoInterprete);
+                            values.put("Titulo", v.titulo.trim());
+                            values.put("Categoria1", v.categoria1);
+                            values.put("Categoria2", v.categoria2);
+                            values.put("Categoria3", v.categoria3);
+                            values.put("Crossover", (v.crossover == true) ? 1 : 0);
+                            values.put("DataVenctoCrossOver", v.dataVencimentoCrossover);
+                            values.put("DiasExecucao", v.diasExecucao1);
+                            values.put("DiasExecucao2", v.diasExecucao2);
+                            values.put("Afinidade1", v.afinadade1.trim());
+                            values.put("Afinidade2", v.afinadade2.trim());
+                            values.put("Afinidade3", v.afinadade3.trim());
+                            values.put("Afinidade4", v.afinadade4.trim());
+                            values.put("Gravadora", v.gravadora);
+                            values.put("AnoGravacao", v.anoGravacao);
+                            values.put("Velocidade", v.velocidade);
+                            values.put("Data", v.data);
+                            values.put("UltimaExecucaoData", v.ultimaExecucaoData);
+                            values.put("TempoTotal", v.tempoTotal);
+                            values.put("QtdePlayer", v.quantidadePlayerTotal);
+                            values.put("DataVencto", v.dataVencimento);
+                            values.put("FrameInicio", v.frameInicio);
+                            values.put("FrameFinal", v.frameFinal);
+                            values.put("Msg", v.mensagem);
+                            db.replace("Video", null, values);
+
+                        } catch (SQLiteCantOpenDatabaseException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteReadOnlyDatabaseException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteDatabaseCorruptException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (SQLiteDatabaseLockedException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (NullPointerException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (InvalidParameterException e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        } catch (Exception e) {
+                            AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                            continue;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
+                return;
+            } finally {
+                db.endTransaction();
+            }
+        }
     }
 }

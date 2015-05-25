@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.banco.BancoDAO;
+import com.utils.RegistrarLog;
 
 public class TaskVideoAndComerciais implements Runnable {
     private BancoDAO bancoDAO;
@@ -20,5 +21,6 @@ public class TaskVideoAndComerciais implements Runnable {
         bancoDAO.programacoes();
         bancoDAO.criarArquivoPlaylist();
         bancoDAO.close();
+        RegistrarLog.imprimirMsg("Log", "TaskVideoAndComerciais");
     }
 }

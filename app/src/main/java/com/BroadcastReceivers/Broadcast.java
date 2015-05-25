@@ -3,14 +3,10 @@ package com.BroadcastReceivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.services.MyService;
 
-/**
- * Created by usuario on 06/04/2015.
- */
 public class Broadcast extends BroadcastReceiver {
 
     @Override

@@ -86,7 +86,9 @@
     <orderEntry type="jdk" jdkName="Android API 14 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-v4-18.0.0" level="project" />
+    <orderEntry type="library" exported="" name="zip4j_1.3.2" level="project" />
     <orderEntry type="library" exported="" name="projetoUtils" level="project" />
+    <orderEntry type="library" exported="" name="ftp4j-1.7.2" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.3.2" level="project" />
     <orderEntry type="library" exported="" name="sqlite-jdbc-3.8.7" level="project" />
   </component>
