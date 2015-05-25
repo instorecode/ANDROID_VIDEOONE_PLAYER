@@ -6,8 +6,6 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.banco.BancoDAO;
-import com.br.instore.utils.Arquivo;
-import com.br.instore.utils.Banco;
 import com.br.instore.utils.ConfiguaracaoUtils;
 import com.br.instore.utils.LogUtils;
 
@@ -15,82 +13,83 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 
 public class RegistrarLog {
 
-    private LogUtils logUtils;
-    private Context context;
     private String barraDoSistema = System.getProperty("file.separator");
-    ;
     private String caminho = Environment.getExternalStorageDirectory().toString();
-    private String nomeVersaoOs = "";
-    private String versaoApp = "";
-    private String ip = "";
-    private String dia = "";
-    private String nomeDispositivo = "";
-    private String espacoTotal = "";
-    private String espacoDisponivel = "";
-    private String arquivosDiretorio = "";
-    private String videosNoBanco = "";
-    private String comerciaisNoBanco = "";
-    private String diretorioLogs;
+    private String dia = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+    private String diretorioLogs = caminho.concat(barraDoSistema).concat("videoOne").concat(barraDoSistema).concat("log");
+    private String caminhoArquivoDiasLogCompleto = caminho.concat(barraDoSistema).concat("videoOne").concat(barraDoSistema).concat("config").concat(barraDoSistema);
 
     private BancoDAO bancoDAO;
+    private Context context;
+    private static RegistrarLog registrarLog;
 
-    public RegistrarLog(Context context) {
+    private RegistrarLog(Context context){
         this.context = context;
-        this.logUtils = new LogUtils();
+        this.bancoDAO = new BancoDAO(context);
     }
 
-
-    private void informacaoes() {
-        setVideosNoBanco();
-        setComerciaisNoBanco();
-        nomeVersaoOs = versaoAndroid(context);
-        versaoApp = versaoAndroid(context);
-        ip = ip();
-        dia = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
-        nomeDispositivo = nomeDispositivo();
-        espacoTotal = espacoTotal();
-        espacoDisponivel = espacoDisponivel();
-        arquivosDiretorio = arquivosDiretorio();
-        diretorioLogs = caminho.concat(barraDoSistema).concat("videoOne").concat(barraDoSistema).concat("log");
-        logUtils.parametros(nomeVersaoOs, versaoApp, ip, dia, nomeDispositivo, espacoTotal, espacoDisponivel, getVideosNoBanco(), getComerciaisNoBanco(), arquivosDiretorio, diretorioLogs);
-    }
-
-    public void escrever(String texto) {
-        String caminhoProperties = caminho.concat(barraDoSistema).concat("videoOne").concat(barraDoSistema).concat("config").concat(barraDoSistema).concat("configuracoes.properties");
-        File properties = new File(caminhoProperties);
-
-        if(properties.exists()){
-            informacaoes();
+    public static RegistrarLog getInstance() throws Exception {
+        if(null == registrarLog){
+            try {
+               throw new Exception("Informe o parametro");
+            } catch (Exception e){
+               AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            }
         }
-        logUtils.registrar(texto);
+
+        try {
+            LogUtils.getInstance();
+        } catch (Exception e) {
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+        }
+        return registrarLog;
     }
 
+    public static RegistrarLog getInstance(Context context){
+        if(null == registrarLog){
+            registrarLog = new RegistrarLog(context);
+        }
+        LogUtils.getInstance(registrarLog.caminhoArquivoDiasLogCompleto, "dias.exp", registrarLog.nomeVersaoOs(registrarLog.context), registrarLog.nomeDispositivo(), registrarLog.ip(), registrarLog.dia, registrarLog.nomeDispositivo(), registrarLog.espacoTotal(), registrarLog.espacoDisponivel(), registrarLog.bancoDAO.quantidadeVideoNoBanco(), registrarLog.bancoDAO.quantidadeComerciaisNoBanco(), registrarLog.arquivosDiretorio(), registrarLog.diretorioLogs);
+        return registrarLog;
+    }
 
-    private String versaoAndroid(Context context) {
-        String versaoApp = null;
+    public static void imprimirMsg(String tag, String texto){
+        Log.e(tag, texto);
+    }
+
+    private String nomeVersaoOs(Context context) {
+        String versaoApp = "";
         try {
             versaoApp = String.valueOf(context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode);
             versaoApp = versaoApp + "." + context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return versaoApp;
+        } catch (NullPointerException e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return versaoApp;
+        } catch (Exception e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return versaoApp;
         }
         return versaoApp;
     }
 
     private String nomeDispositivo() {
-        String nomeDispositivo = null;
+        String nomeDispositivo = "";
         nomeDispositivo = android.os.Build.MODEL;
         return nomeDispositivo;
     }
 
     private String ip() {
-        String ipDispositivo = null;
+        String ipDispositivo = "";
         try {
             Enumeration<NetworkInterface> enumerationNetworkInterface = NetworkInterface.getNetworkInterfaces();
             while (enumerationNetworkInterface.hasMoreElements()) {
@@ -102,52 +101,73 @@ public class RegistrarLog {
                 }
             }
         } catch (SocketException e) {
-            e.printStackTrace();
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return ipDispositivo;
+        } catch (NullPointerException e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return ipDispositivo;
+        } catch (Exception e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return ipDispositivo;
         }
         return ipDispositivo;
     }
 
     private String espacoTotal() {
-        String espacoTotal = null;
+        String espacoTotal = "";
         long espaco = new File(Environment.getExternalStorageDirectory().getAbsolutePath()).getTotalSpace();
         double espacoDouble = espaco / (1024 * 1024);
-        espacoTotal = String.valueOf(espacoDouble);
+
+        try{
+            espacoTotal = String.valueOf(espacoDouble);
+        } catch (NullPointerException e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return espacoTotal;
+        } catch (InvalidParameterException e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return espacoTotal;
+        } catch (Exception e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return espacoTotal;
+        }
         return espacoTotal;
     }
 
     private String espacoDisponivel() {
-        String espacoDisponivel = null;
+        String espacoDisponivel = "";
         long espaco = new File(Environment.getExternalStorageDirectory().getAbsolutePath()).getFreeSpace();
         double espacoDouble = espaco / (1024 * 1024);
-        espacoDisponivel = String.valueOf(espacoDouble);
+        try{
+            espacoDisponivel = String.valueOf(espacoDouble);
+        } catch (NullPointerException e) {
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return espacoDisponivel;
+        } catch (InvalidParameterException e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return espacoDisponivel;
+        } catch (Exception e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return espacoDisponivel;
+        }
         return espacoDisponivel;
     }
 
     private String arquivosDiretorio() {
-        String arquivosNoDiretorio = null;
-        File file = new File(caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioVideo()));
-        Arquivo.criarDiretorio(file);
-        arquivosNoDiretorio = String.valueOf(file.listFiles().length);
+        String arquivosNoDiretorio = "";
+        try {
+            File file = new File(caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioVideo()));
+            arquivosNoDiretorio = String.valueOf(file.listFiles().length);
+        } catch (NullPointerException e) {
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return arquivosNoDiretorio;
+        } catch (InvalidParameterException e){
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return arquivosNoDiretorio;
+        } catch (Exception e) {
+            AndroidImprimirUtils.imprimirErro(RegistrarLog.class, e);
+            return arquivosNoDiretorio;
+        }
         return arquivosNoDiretorio;
     }
 
-    private void setVideosNoBanco() {
-        bancoDAO = new BancoDAO(context);
-        this.videosNoBanco = bancoDAO.quantidadeVideoNoBanco();
-        bancoDAO.close();
-    }
-
-    private String getVideosNoBanco() {
-        return videosNoBanco;
-    }
-
-    private void setComerciaisNoBanco() {
-        bancoDAO = new BancoDAO(context);
-        this.comerciaisNoBanco = bancoDAO.quantidadeComerciaisNoBanco();
-        bancoDAO.close();
-    }
-
-    private String getComerciaisNoBanco() {
-        return this.comerciaisNoBanco;
-    }
 }
