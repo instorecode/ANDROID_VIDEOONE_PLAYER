@@ -1,16 +1,10 @@
 package com.Tarefas;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Environment;
-import android.widget.Toast;
 
 import com.br.instore.utils.ConfiguaracaoUtils;
-import com.utils.AndroidImprimirUtils;
 import com.utils.RegistrarLog;
-
-import java.io.File;
-import java.util.Observable;
 
 public class TaskLerProperties implements Runnable {
 

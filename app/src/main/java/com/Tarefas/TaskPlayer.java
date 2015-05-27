@@ -60,7 +60,6 @@ public class TaskPlayer implements Runnable {
     @Override
     public void run() {
         //Toast.makeText(context, playlist.size() + "", Toast.LENGTH_SHORT).show();
-
         RandomAccessFile reader = null;
         String load = "";
         try {

@@ -2,24 +2,19 @@ package com.Tarefas;
 
 import android.content.Context;
 import android.os.Environment;
-import android.widget.Toast;
-
 import com.banco.BancoDAO;
 import com.br.instore.utils.Arquivo;
 import com.br.instore.utils.ConfiguaracaoUtils;
-import com.br.instore.utils.ImprimirUtils;
 import com.br.instore.utils.LogUtils;
 import com.br.instore.utils.Md5Utils;
 import com.comunicacao.TransferCustom;
 import com.comunicacao.ValidarDiaAndHora;
 import com.utils.AndroidImprimirUtils;
 import com.utils.RegistrarLog;
-
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,7 +22,6 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
-
 import it.sauronsoftware.ftp4j.FTPAbortedException;
 import it.sauronsoftware.ftp4j.FTPClient;
 import it.sauronsoftware.ftp4j.FTPDataTransferException;
@@ -95,7 +89,7 @@ public class TarefaComunicao implements Runnable {
                             bancoDAO.close();
                             hashId = validarHoraAndDia.hashId();
                         }
-                    }
+                    }//8
                 }
 
                 if(isEmergencia && null != ftp && !ftp.isConnected()) {
@@ -112,25 +106,34 @@ public class TarefaComunicao implements Runnable {
                     Thread.sleep(20000);
                 } catch (InterruptedException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                 } catch (NullPointerException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                 } catch (InstantiationError e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                 } catch (InvalidParameterException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                 } catch (Exception e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                 }
             }
 
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         } catch (InstantiationError e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         }
     }
 
@@ -357,12 +360,15 @@ public class TarefaComunicao implements Runnable {
             zip = new ZipFile(arquivoZip);
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             download();
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             download();
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             download();
         }
 
@@ -377,10 +383,13 @@ public class TarefaComunicao implements Runnable {
             }
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         }
 
         try {
@@ -392,10 +401,13 @@ public class TarefaComunicao implements Runnable {
             }
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         }
 
         try {
@@ -407,10 +419,13 @@ public class TarefaComunicao implements Runnable {
             }
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
         }
 
 
@@ -420,15 +435,19 @@ public class TarefaComunicao implements Runnable {
                     zip.addFile(arquivosHaCompactar, parameters);
                 } catch (ZipException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                     continue;
                 } catch (NullPointerException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                     continue;
                 } catch (InvalidParameterException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                     continue;
                 } catch (Exception e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                     continue;
                 }
             }
@@ -490,38 +509,47 @@ public class TarefaComunicao implements Runnable {
             files = ftp.list();
         } catch (IOException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
             return;
         } catch (FTPIllegalReplyException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
             return;
         } catch (FTPException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
             return;
         } catch (FTPDataTransferException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
             return;
         } catch (FTPAbortedException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
             return;
         } catch (FTPListParseException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
             return;
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
             return;
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
             return;
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
             return;
         }
@@ -643,21 +671,24 @@ public class TarefaComunicao implements Runnable {
         }
         md5Utils.getArquivosValidos().clear();
         arquivosValidos.clear();
-        validarExp();
+        validarDescompactarVideoOneExp();
     }
 
-    public void validarExp() {
+    public void validarDescompactarVideoOneExp() {
         File videoOneExp = null;
         try {
             videoOneExp = new File(salvar_importes.concat(barraDoSistema).concat("videoOne.exp"));
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
         }
 
@@ -666,9 +697,11 @@ public class TarefaComunicao implements Runnable {
             tamanho = videoOneExp.length();
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             desconectarFtp(false);
         }
 
@@ -679,15 +712,19 @@ public class TarefaComunicao implements Runnable {
                 zip = new ZipFile(videoOneExp);
             } catch (ZipException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                 desconectarFtp(false);
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                 desconectarFtp(false);
             } catch (InvalidParameterException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                 desconectarFtp(false);
             } catch (Exception e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                 desconectarFtp(false);
             }
 
@@ -696,27 +733,60 @@ public class TarefaComunicao implements Runnable {
                     zip.extractAll(salvar_importes);
                 } catch (ZipException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                     desconectarFtp(false);
                 } catch (NullPointerException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                     desconectarFtp(false);
                 } catch (InvalidParameterException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                     desconectarFtp(false);
                 } catch (Exception e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
                     desconectarFtp(false);
                 }
+                moverOsArquivosDOImport();
+                deletarArquivoVideoOneExp(videoOneExp);
+                desconectarFtp(true);
             } else {
                 RegistrarLog.imprimirMsg("Log", "Arquivo de zip está luno");
                 desconectarFtp(false);
             }
+        } else {
+            moverOsArquivosDOImport();
+            RegistrarLog.imprimirMsg("Log", "Nenhum arquivo videoOne.exp foi encontrado");
+            desconectarFtp(true);
+        }
+    }
 
+    private void deletarArquivoVideoOneExp(File arquivo){
+        try {
+            File apk = new File(diretorioVideoOne.concat(barraDoSistema).concat("videoOne.apk"));
+            File db = new File(diretorioVideoOne.concat(barraDoSistema).concat("videoOneDs.db"));
+            File properties = new File(diretorioVideoOne.concat(barraDoSistema).concat("configuracoes.properties"));
+            if (apk.exists() && db.exists() && properties.exists()) {
+                arquivo.delete();
+            }
+        } catch (NullPointerException e){
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
+        } catch (InvalidParameterException e){
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
+        } catch (Exception e){
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+            AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
+        }
+    }
 
-            File arquivosNoDiretorioImport = new File(salvar_importes);
-            if (null != arquivosNoDiretorioImport) {
-                for (File arquivo : arquivosNoDiretorioImport.listFiles()) {
-
+    private void moverOsArquivosDOImport(){
+        File arquivosNoDiretorioImport = new File(salvar_importes);
+        if (null != arquivosNoDiretorioImport && arquivosNoDiretorioImport.exists()) {
+            for (File arquivo : arquivosNoDiretorioImport.listFiles()) {
+                try {
                     if (arquivo.getName().endsWith(".apk")) {
                         boolean moveuArquivo = Arquivo.moverArquivo(arquivo, new File(diretorioVideoOne.concat(barraDoSistema).concat(arquivo.getName())));
                         if (moveuArquivo) {
@@ -737,18 +807,23 @@ public class TarefaComunicao implements Runnable {
                             arquivo.delete();
                         }
                     }
+                } catch (NullPointerException e){
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
+                    continue;
+                } catch (InvalidParameterException e){
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
+                    continue;
+                } catch (Exception e){
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                    AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
+                    continue;
                 }
-            } else {
-                RegistrarLog.imprimirMsg("Log", "Nenhum arquivo foi encontrado no diretório import");
-                desconectarFtp(true);
+
             }
-
-            videoOneExp.delete();
-            desconectarFtp(true);
-
         } else {
-            RegistrarLog.imprimirMsg("Log", "Nenhum arquivo videoOne.exp foi encontrado");
-            desconectarFtp(true);
+            RegistrarLog.imprimirMsg("Log", "Nenhum arquivo foi encontrado no diretório import");
         }
     }
 
@@ -810,10 +885,13 @@ public class TarefaComunicao implements Runnable {
                 arquivoCategoria.renameTo(renomearExpCategoria);
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             } catch (InvalidParameterException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             } catch (Exception e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             }
         }
 
@@ -824,10 +902,13 @@ public class TarefaComunicao implements Runnable {
                 arquivoComercial.renameTo(renomearExpComercial);
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             } catch (InvalidParameterException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             } catch (Exception e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             }
         }
 
@@ -838,10 +919,13 @@ public class TarefaComunicao implements Runnable {
                 arquivoProgramacao.renameTo(renomearExpProgramacao);
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             } catch (InvalidParameterException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             } catch (Exception e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             }
         }
 
@@ -852,10 +936,13 @@ public class TarefaComunicao implements Runnable {
                 arquivoVideo.renameTo(renomearExpVideo);
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             } catch (InvalidParameterException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             } catch (Exception e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
+                AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e, 90);
             }
         }
         RegistrarLog.imprimirMsg("Log", "Banco Populado ");
