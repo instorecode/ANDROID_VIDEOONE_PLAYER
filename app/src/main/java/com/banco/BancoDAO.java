@@ -45,7 +45,7 @@ public class BancoDAO {
     private List<String> listaDeArquivos = new ArrayList<String>();
     private List<ComercialDet> listaComercialDeterminados = new ArrayList<ComercialDet>();
     private List<String> linhasPlaylistDet = new ArrayList<String>();
-
+    private String teste = "a";
     private Banco banco = new Banco();
     private ExpUtils expUtils = new ExpUtils();
     private Cursor cursor;
