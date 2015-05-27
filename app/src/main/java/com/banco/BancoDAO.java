@@ -159,6 +159,7 @@ public class BancoDAO {
                 listaProgramacao.clear();
                 listaDeArquivos.add("semVideo");
                 return;
+                //asfsa
             }
         } else {
             RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : programacoes()");
