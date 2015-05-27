@@ -2,11 +2,25 @@
 <items version="2" >
 
     <item
+        jar="C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\libs\ftp4j-1.7.2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="abd6a2ba75b142926052c4538611efda49e0b0e2">
+        <dex dex="C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\build\intermediates\pre-dexed\debug\ftp4j-1.7.2-f3a3a24caa6e4f67a18282b11423e0f23bbb6850.jar" />
+    </item>
+    <item
         jar="C:\Users\usuario\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-v4\18.0.0\support-v4-18.0.0.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
         <dex dex="C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\build\intermediates\pre-dexed\debug\support-v4-18.0.0-4500bce4d5b0ca5fb106af3dd5615000a85091b3.jar" />
+    </item>
+    <item
+        jar="C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\libs\zip4j_1.3.2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="3e20955923c5b61bfbcd4590a87720643c729695">
+        <dex dex="C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\build\intermediates\pre-dexed\debug\zip4j_1.3.2-e246ca72dcb047561431c8ecb9d52f6649115dd7.jar" />
     </item>
     <item
         jar="C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\libs\commons-lang3-3.3.2.jar"
@@ -26,7 +40,7 @@
         jar="C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\libs\projetoUtils.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="036ad57b48ef4293eda888bd63ed437711bb6e9a">
+        sha1="8bd984d2af1a28acd2ca21d4f3c70aade94035c0">
         <dex dex="C:\Users\usuario\Google Drive\ANDROID_VIDEOONE_PLAYER\app\build\intermediates\pre-dexed\debug\projetoUtils-ac38f9abfdfc5cf9d2be588d9988fa4ae4784549.jar" />
     </item>
 

@@ -17,6 +17,7 @@ import com.Tarefas.TaskPlayer;
 import com.Tarefas.TaskPlayerComericiaisDeterminados;
 import com.Tarefas.TaskVideoAndComerciais;
 import com.utils.AndroidImprimirUtils;
+import com.utils.RegistrarLog;
 
 public class MainActivity extends Activity {
     private Context context;
@@ -35,30 +36,26 @@ public class MainActivity extends Activity {
         ScheduledExecutorService criarPlayListDeterminados = Executors.newScheduledThreadPool(1);
         ScheduledExecutorService criarPlayListNormal = Executors.newScheduledThreadPool(1);
 
+        RegistrarLog.imprimirMsg("Log", "onCreate");
         lerProperties.scheduleAtFixedRate(new TaskLerProperties(context), 0, 10, TimeUnit.SECONDS);
         criarViewExcluirVencidos.scheduleAtFixedRate(new TaskCriarViewExcluirInvalidos(context), 0, 24, TimeUnit.HOURS);
-        threadComunicacaoNormal.scheduleAtFixedRate(new TarefaComunicao(context), 2, 30, TimeUnit.SECONDS);
-        threadComunicacaoEmergencia.scheduleAtFixedRate(new TarefaComunicao(context), 5, 1800, TimeUnit.SECONDS);
-        criarPlayListDeterminados.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 700, 30000, TimeUnit.MILLISECONDS);
-        criarPlayListNormal.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 700, 30000, TimeUnit.MILLISECONDS);
+        threadComunicacaoNormal.scheduleAtFixedRate(new TarefaComunicao(context,false), 2, 60, TimeUnit.SECONDS);
+        //threadComunicacaoEmergencia.scheduleAtFixedRate(new TarefaComunicao(context,true), 3, 1800, TimeUnit.SECONDS);
+        criarPlayListDeterminados.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 4, 30, TimeUnit.SECONDS);
+        criarPlayListNormal.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 4, 30, TimeUnit.SECONDS);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            AndroidImprimirUtils.imprimirErro(MainActivity.this, e);
-        }
-
         final Handler handlerNormal = new Handler();
-        TaskPlayer taskPlayer = new TaskPlayer(this, handlerNormal, getApplicationContext());
+        TaskPlayer taskPlayer = new TaskPlayer(this, handlerNormal, getApplicationContext(),getSystemService(ACTIVITY_SERVICE));
         handlerNormal.post(taskPlayer);
 
-        final Handler handlerDeterminados = new Handler();
-        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer, context));
+        //final Handler handlerDeterminados = new Handler();
+        //handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer, context));
 
     }
 }

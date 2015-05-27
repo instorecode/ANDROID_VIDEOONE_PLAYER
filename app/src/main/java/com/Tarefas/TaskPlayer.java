@@ -1,5 +1,6 @@
 package com.Tarefas;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Environment;
@@ -13,6 +14,7 @@ import com.br.instore.utils.LogUtils;
 import com.player.MainActivity;
 import com.player.R;
 import com.utils.AndroidImprimirUtils;
+import com.utils.RegistrarLog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.security.InvalidParameterException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -43,17 +46,46 @@ public class TaskPlayer implements Runnable {
     private final String caminho = Environment.getExternalStorageDirectory().toString();
     private boolean videoVazio = true;
     private int duracao = 60000;
+    private Object obj;
 
-
-    public TaskPlayer(MainActivity mainActivity, Handler handler, Context context) {
+    public TaskPlayer(MainActivity mainActivity, Handler handler, Context context, Object obj) {
         this.main = mainActivity;
         this.handler = handler;
         this.context = context;
+        this.obj = obj;
     }
+
+
 
     @Override
     public void run() {
-        Toast.makeText(context, playlist.size() + "", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, playlist.size() + "", Toast.LENGTH_SHORT).show();
+
+        RandomAccessFile reader = null;
+        String load = "";
+        try {
+            reader = new RandomAccessFile("/proc/meminfo", "r");
+            load = reader.readLine();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            String a = load.replaceAll("\\s", "").trim();
+            RegistrarLog.imprimirMsg("Log", a);
+            String b = load.split(":")[1];
+            RegistrarLog.imprimirMsg("Log", b);
+            String c = b.split("k")[0];
+            RegistrarLog.imprimirMsg("Log", c.trim());
+
+            long total = Long.parseLong(c.trim());
+            total = total / 1024L;
+            RegistrarLog.imprimirMsg("Log", total + "");
+            Toast.makeText(context, total + " TOTAL RAM", Toast.LENGTH_LONG).show();
+        } catch (Exception e){
+            AndroidImprimirUtils.imprimirErro(TaskPlayer.class,e);
+        }
+
         if (playlist == null || playlist.isEmpty() || playlist.size()  == 0) {
             lerLinhas();
             if (videoVazio) {
@@ -78,6 +110,7 @@ public class TaskPlayer implements Runnable {
                         return;
                     }
                 }
+
             }
         } else {
             String linha = playlist.get(0);
@@ -249,8 +282,8 @@ public class TaskPlayer implements Runnable {
         Date horaFinalProgramacao = null;
         String dataAtual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         try {
-            horaInicialProgramação = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss").parse(dataAtual.concat(horaInicial));
-            horaFinalProgramacao = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss").parse(dataAtual.concat(horaFinal));
+            horaInicialProgramação = new SimpleDateFormat("yyyy-MM-ddHH:mm").parse(dataAtual.concat(horaInicial));
+            horaFinalProgramacao = new SimpleDateFormat("yyyy-MM-ddHH:mm").parse(dataAtual.concat(horaFinal));
         } catch (ParseException e) {
             AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
             return false;
@@ -315,7 +348,7 @@ public class TaskPlayer implements Runnable {
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 public void onPrepared(MediaPlayer mp) {
                     duracao = videoView.getDuration();
-                    Toast.makeText(context, arquivoVideo + " " + new SimpleDateFormat("HH:mm:ss").format(new Date()), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context, arquivoVideo + " " + new SimpleDateFormat("HH:mm:ss").format(new Date()), Toast.LENGTH_LONG).show();
                     bancoDAO.atualizarBanco(arquivoVideo, duracao, tipoCategoria);
                     bancoDAO.close();
                     videoView.requestFocus();
@@ -329,6 +362,18 @@ public class TaskPlayer implements Runnable {
                     df.setTimeZone(TimeZone.getTimeZone("GMT+0"));
                     String duracaoDoVideo = df.format(new Date(duracao));
                     LogUtils.registrar(02, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 02 Tocou o video: " + video + "@" + titulo + "@" + categoria + "@" + velocidade + "@" + duracaoDoVideo);
+
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) obj;
+                    activityManager.getMemoryInfo(mi);
+                    long availableMegs = mi.availMem / 1048576L;
+                    RegistrarLog.imprimirMsg("Log", availableMegs + " RAM");
+                    try {
+                        Toast.makeText(context, availableMegs + " RAM", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e){
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class,e);
+                    }
+
                     run();
                     return;
                 }

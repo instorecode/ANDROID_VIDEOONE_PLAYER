@@ -487,12 +487,12 @@ public class BancoDAO {
     }
 
     public void criarArquivoPlaylist() {
-        File playlistAntiga = new File(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist().concat(barraDoSistema).concat("playlist.exp"));
+        File playlistAntiga = new File(caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlist.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();
         }
 
-        File playlistNova = new File(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist().concat(barraDoSistema).concat("playlist.exp"));
+        File playlistNova = new File(caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlist.exp"));
         try {
             playlistNova.createNewFile();
         } catch (IOException e) {
@@ -977,12 +977,12 @@ public class BancoDAO {
     }
 
     public void criarPlaylistDeterminados() {
-        File playlistAntiga = new File(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist().concat(barraDoSistema).concat("playlistDet.exp"));
+        File playlistAntiga = new File(caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlistDet.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();
         }
 
-        File playlistDeterminados = new File(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist().concat(barraDoSistema).concat("playlistDet.exp"));
+        File playlistDeterminados = new File(caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlistDet.exp"));
 
         try {
             playlistDeterminados.createNewFile();

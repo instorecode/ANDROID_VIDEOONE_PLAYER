@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.banco.BancoDAO;
 import com.br.instore.utils.Arquivo;
 import com.br.instore.utils.ConfiguaracaoUtils;
+import com.br.instore.utils.ImprimirUtils;
 import com.br.instore.utils.LogUtils;
 import com.br.instore.utils.Md5Utils;
 import com.comunicacao.TransferCustom;
@@ -55,10 +56,11 @@ public class TarefaComunicao implements Runnable {
     private int tentativasRealizadas = 0;
     private String hashId = "";
     private ValidarDiaAndHora validarHoraAndDia;
+    private boolean isEmergencia;
 
-
-    public TarefaComunicao(Context context) {
+    public TarefaComunicao(Context context, boolean isEmergencia) {
         this.context = context;
+        this.isEmergencia = isEmergencia;
         bancoDAO = new BancoDAO(context);
     }
 
@@ -66,6 +68,7 @@ public class TarefaComunicao implements Runnable {
     public void run() {
         RegistrarLog.imprimirMsg("Log", "------------------------------------------------------------------------------------------------------------------------------------------------");
         File properties = new File(caminho.concat(barraDoSistema).concat("videoOne").concat(barraDoSistema).concat("config"));
+        RegistrarLog.imprimirMsg("Log", "INICIOU A COMUNICAÇÃO ");
 
         try {
             validarHoraAndDia = new ValidarDiaAndHora(caminho.concat("/videoOne/config/configuracoes.properties"));
@@ -74,20 +77,19 @@ public class TarefaComunicao implements Runnable {
                 informacoesConexao();
                 validarHoraAndDia.procurarHorarioValido();
 
+                RegistrarLog.imprimirMsg("Log", "TENTATIVAS REALIZADAS " + tentativasRealizadas);
+                LogUtils.registrar(10,ConfiguaracaoUtils.diretorio.isLogCompleto(), " 10 " + tentativasRealizadas);
+                RegistrarLog.imprimirMsg("Log", "MAXIMAS DE TENTATIVAS " + maximoTentativas);
+
                 if (!ftp.isConnected()) {
-                    RegistrarLog.imprimirMsg("Log", "NÃO É EMERGENCIA E NÃO ESTA CONECTADO");
                     if (validarHoraAndDia.isValid()) {
                         if (!hashId.equals(validarHoraAndDia.hashId())) {
-                            //ZERA AS TENTATIVAS DEVIDO OS HORARIOS SEREM DIFERENTES
-                            RegistrarLog.imprimirMsg("Log", "É UM NOVO HORARIO VALIDO RODANDO");
+                            //ZERA AS TENTATIVAS DEVIDO OS HORARIOS SEREM
                             tentativasRealizadas = 0;
                         }
 
-                        if (tentativasRealizadas < maximoTentativas) {
-                            RegistrarLog.imprimirMsg("Log", "INICIOU A COMUNICAÇÃO ");
-                            RegistrarLog.imprimirMsg("Log", "TENTATIVAS REALIZADAS " + tentativasRealizadas);
-                            RegistrarLog.imprimirMsg("Log", "MAXIMAS DE TENTATIVAS " + maximoTentativas);
-                            RegistrarLog.imprimirMsg("Log", "É UM HORARIO VALIDO RODANDO TENTATIVAS TAMBEM VALIDAS");
+                        if (tentativasRealizadas <= 999999999) {
+                            RegistrarLog.imprimirMsg("Log", "COMUNICACAO");
                             conectarEnderecoFtp(false);
                             popularBanco();
                             bancoDAO.close();
@@ -96,15 +98,13 @@ public class TarefaComunicao implements Runnable {
                     }
                 }
 
-                if (null != ftp && !ftp.isConnected()) {
+                if(isEmergencia && null != ftp && !ftp.isConnected()) {
                     // executar o emergencia
-                    RegistrarLog.imprimirMsg("Log", "NÂO É UM HORARIO VALIDO RODANDO EMERGENCIA");
+                    RegistrarLog.imprimirMsg("Log", "RODANDO EMERGENCIA");
                     conectarEnderecoFtp(true);
                     popularBanco();
                     bancoDAO.close();
                 }
-
-                RegistrarLog.imprimirMsg("Log", "RODOU NOVAMENTE");
 
             } else {
                 LogUtils.registrar(01, true, " Arquivo de configurações não existe, não é possível se comunicar");
@@ -235,38 +235,31 @@ public class TarefaComunicao implements Runnable {
         } catch (IllegalStateException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 IP ou endereço esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (IOException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 IP ou endereço esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (FTPIllegalReplyException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 IP ou endereço esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (FTPException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 IP ou endereço esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 IP ou endereço esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 IP ou endereço esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 IP ou endereço esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         }
     }
 
@@ -278,38 +271,31 @@ public class TarefaComunicao implements Runnable {
         } catch (IllegalStateException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Usuario ou senha de FTP estão incorretos " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (IOException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Usuario ou senha de FTP estão incorretos " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (FTPIllegalReplyException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Usuario ou senha de FTP estão incorretos " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (FTPException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Usuario ou senha de FTP estão incorretos " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Usuario ou senha de FTP estão incorretos " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Usuario ou senha de FTP estão incorretos " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Usuario ou senha de FTP estão incorretos " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         }
     }
 
@@ -320,6 +306,7 @@ public class TarefaComunicao implements Runnable {
                 LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Entrou no diretório " + ConfiguaracaoUtils.ftp.getDiretorioRemoto() + " com sucesso");
                 download();
             } else {
+                //ftp.changeDirectory(null);
                 ftp.changeDirectory(ConfiguaracaoUtils.ftp.getDiretorioRemoto());
                 LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Entrou no diretório " + ConfiguaracaoUtils.ftp.getDiretorioRemoto() + " com sucesso");
                 zipArquivos();
@@ -327,38 +314,31 @@ public class TarefaComunicao implements Runnable {
         } catch (IllegalStateException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Diretório informado esta errado" + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (IOException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Diretório informado esta errado" + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (FTPIllegalReplyException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Diretório informado esta errado" + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (FTPException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Diretório informado esta errado" + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Diretório informado esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Diretório informado esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Diretório informado esta errado " + " " + e.getMessage());
-            tentativasRealizadas++;
-            desconectarFtp();
+            desconectarFtp(true);
         }
     }
 
@@ -510,39 +490,39 @@ public class TarefaComunicao implements Runnable {
             files = ftp.list();
         } catch (IOException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
             return;
         } catch (FTPIllegalReplyException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
             return;
         } catch (FTPException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
             return;
         } catch (FTPDataTransferException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
             return;
         } catch (FTPAbortedException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
             return;
         } catch (FTPListParseException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
             return;
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
             return;
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
             return;
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
             return;
         }
 
@@ -552,6 +532,7 @@ public class TarefaComunicao implements Runnable {
                     if (file.getName().contains(".mov") || file.getName().contains(".md5") || file.getName().contains(".db") || file.getName().contains(".exp")) {
                         try {
                             RegistrarLog.imprimirMsg("Log", " Arquivos no servidor FTP " + file.getName());
+                            RegistrarLog.imprimirMsg("Log", new File(salvar_importes.concat(barraDoSistema).concat(file.getName())).getAbsolutePath());
                             ftp.download(file.getName(), new FileOutputStream(new File(salvar_importes.concat(barraDoSistema).concat(file.getName()))), 0, new TransferCustom());
                             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Arquivos no servidor FTP " + file.getName() + " baixado com sucesso");
                         } catch (IllegalStateException e) {
@@ -641,9 +622,9 @@ public class TarefaComunicao implements Runnable {
     private void validarMd5() {
         md5Utils.controladorArquivosFragmentados(salvar_importes);
         List<File> arquivosValidos = md5Utils.getArquivosValidos();
-
         if (null != arquivosValidos && !arquivosValidos.isEmpty()) {
             for (File file : arquivosValidos) {
+                RegistrarLog.imprimirMsg("Log", file.getAbsolutePath());
                 boolean moveuArquivo = Arquivo.moverArquivo(file, new File(diretorioDeVideos.concat(barraDoSistema).concat(file.getName())));
 
                 if (moveuArquivo) {
@@ -671,13 +652,13 @@ public class TarefaComunicao implements Runnable {
             videoOneExp = new File(salvar_importes.concat(barraDoSistema).concat("videoOne.exp"));
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
         } catch (InvalidParameterException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
         }
 
         long tamanho = 0;
@@ -685,10 +666,10 @@ public class TarefaComunicao implements Runnable {
             tamanho = videoOneExp.length();
         } catch (NullPointerException e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
         } catch (Exception e) {
             AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-            desconectarFtp();
+            desconectarFtp(false);
         }
 
 
@@ -698,16 +679,16 @@ public class TarefaComunicao implements Runnable {
                 zip = new ZipFile(videoOneExp);
             } catch (ZipException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-                desconectarFtp();
+                desconectarFtp(false);
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-                desconectarFtp();
+                desconectarFtp(false);
             } catch (InvalidParameterException e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-                desconectarFtp();
+                desconectarFtp(false);
             } catch (Exception e) {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-                desconectarFtp();
+                desconectarFtp(false);
             }
 
             if (null != zip) {
@@ -715,20 +696,20 @@ public class TarefaComunicao implements Runnable {
                     zip.extractAll(salvar_importes);
                 } catch (ZipException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-                    desconectarFtp();
+                    desconectarFtp(false);
                 } catch (NullPointerException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-                    desconectarFtp();
+                    desconectarFtp(false);
                 } catch (InvalidParameterException e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-                    desconectarFtp();
+                    desconectarFtp(false);
                 } catch (Exception e) {
                     AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
-                    desconectarFtp();
+                    desconectarFtp(false);
                 }
             } else {
                 RegistrarLog.imprimirMsg("Log", "Arquivo de zip está luno");
-                desconectarFtp();
+                desconectarFtp(false);
             }
 
 
@@ -759,19 +740,19 @@ public class TarefaComunicao implements Runnable {
                 }
             } else {
                 RegistrarLog.imprimirMsg("Log", "Nenhum arquivo foi encontrado no diretório import");
-                desconectarFtp();
+                desconectarFtp(true);
             }
 
             videoOneExp.delete();
-            desconectarFtp();
+            desconectarFtp(true);
 
         } else {
             RegistrarLog.imprimirMsg("Log", "Nenhum arquivo videoOne.exp foi encontrado");
-            desconectarFtp();
+            desconectarFtp(true);
         }
     }
 
-    private void desconectarFtp() {
+    private void desconectarFtp(boolean incrementarTentativasRealizadas) {
         RegistrarLog.imprimirMsg("Log", "Metodo Desconectar ftp");
         if (ftp.isConnected()) {
             try {
@@ -800,6 +781,10 @@ public class TarefaComunicao implements Runnable {
                 AndroidImprimirUtils.imprimirErro(TarefaComunicao.class, e);
                 LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 O servidor ftp não finalizou a conexão " + e.getMessage());
                 ftp = new FTPClient();
+            } finally {
+                if(incrementarTentativasRealizadas && !isEmergencia){
+                    tentativasRealizadas++;
+                }
             }
         }
 
