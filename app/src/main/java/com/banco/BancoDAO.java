@@ -156,10 +156,11 @@ public class BancoDAO {
                 }
                 categorias();
             } else {
+                LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Não a programação válida para o horario");
+                RegistrarLog.imprimirMsg("Log", " 90 Não a programação válida para o horario");
                 listaProgramacao.clear();
                 listaDeArquivos.add("semVideo");
                 return;
-                //asfsa
             }
         } else {
             RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : programacoes()");
@@ -200,6 +201,8 @@ public class BancoDAO {
         }
 
         if (null == listaDeArquivos || listaDeArquivos.isEmpty()) {
+            LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Não a videos nem comerciais válidos");
+            RegistrarLog.imprimirMsg("Log", " 90 Não a videos nem comerciais válidos");
             listaDeArquivos.add("semVideo");
             listaProgramacao.clear();
             return;

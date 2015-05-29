@@ -9,11 +9,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 
-import com.tarefas.TaskComerciaisDeterminados;
-import com.tarefas.TaskCriarViewExcluirInvalidos;
-import com.tarefas.TaskLerProperties;
-import com.tarefas.TaskPlayer;
-import com.tarefas.TaskVideoAndComerciais;
+import com.Tarefas.TaskComerciaisDeterminados;
+import com.Tarefas.TaskCriarViewExcluirInvalidos;
+import com.Tarefas.TaskLerProperties;
+import com.Tarefas.TaskPlayer;
+import com.Tarefas.TaskPlayerComericiaisDeterminados;
+import com.Tarefas.TaskVideoAndComerciais;
 import com.utils.RegistrarLog;
 
 public class MainActivity extends Activity {
@@ -33,7 +34,6 @@ public class MainActivity extends Activity {
         ScheduledExecutorService criarPlayListDeterminados = Executors.newScheduledThreadPool(1);
         ScheduledExecutorService criarPlayListNormal = Executors.newScheduledThreadPool(1);
 
-        RegistrarLog.imprimirMsg("Log", "onCreate");
         lerProperties.scheduleAtFixedRate(new TaskLerProperties(context), 0, 10, TimeUnit.SECONDS);
         criarViewExcluirVencidos.scheduleAtFixedRate(new TaskCriarViewExcluirInvalidos(context), 0, 24, TimeUnit.HOURS);
         //threadComunicacaoNormal.scheduleAtFixedRate(new TarefaComunicao(context,false), 2, 60, TimeUnit.SECONDS);
@@ -50,9 +50,8 @@ public class MainActivity extends Activity {
         final Handler handlerNormal = new Handler();
         TaskPlayer taskPlayer = new TaskPlayer(this, handlerNormal, getApplicationContext(),getSystemService(ACTIVITY_SERVICE));
         handlerNormal.post(taskPlayer);
-
-        //final Handler handlerDeterminados = new Handler();
-        //handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer, context));
+        final Handler handlerDeterminados = new Handler();
+        handlerDeterminados.post(new TaskPlayerComericiaisDeterminados(handlerDeterminados, taskPlayer, context));
 
     }
 }

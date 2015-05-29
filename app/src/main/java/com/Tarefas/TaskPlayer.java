@@ -317,6 +317,7 @@ public class TaskPlayer implements Runnable {
             videoView.destroyDrawingCache();
             videoView.setVisibility(View.INVISIBLE);
             videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+            Toast.makeText(context, linha, Toast.LENGTH_LONG).show();
             executar(linha);
         }
     }
