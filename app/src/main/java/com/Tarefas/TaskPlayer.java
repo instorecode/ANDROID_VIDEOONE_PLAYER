@@ -348,7 +348,7 @@ public class TaskPlayer implements Runnable {
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 public void onPrepared(MediaPlayer mp) {
                     duracao = videoView.getDuration();
-                    //Toast.makeText(context, arquivoVideo + " " + new SimpleDateFormat("HH:mm:ss").format(new Date()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, arquivoVideo + " " + new SimpleDateFormat("HH:mm:ss").format(new Date()), Toast.LENGTH_LONG).show();
                     bancoDAO.atualizarBanco(arquivoVideo, duracao, tipoCategoria);
                     bancoDAO.close();
                     videoView.requestFocus();

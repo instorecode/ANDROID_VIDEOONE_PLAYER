@@ -28,18 +28,18 @@ public class MainActivity extends Activity {
         context = getApplicationContext();
 
         ScheduledExecutorService lerProperties = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService criarViewExcluirVencidos = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService threadComunicacaoNormal = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService threadComunicacaoEmergencia = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService criarPlayListDeterminados = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService criarPlayListNormal = Executors.newScheduledThreadPool(1);
+        //ScheduledExecutorService criarViewExcluirVencidos = Executors.newScheduledThreadPool(1);
+        //ScheduledExecutorService threadComunicacaoNormal = Executors.newScheduledThreadPool(1);
+        //ScheduledExecutorService threadComunicacaoEmergencia = Executors.newScheduledThreadPool(1);
+        //ScheduledExecutorService criarPlayListDeterminados = Executors.newScheduledThreadPool(1);
+        //ScheduledExecutorService criarPlayListNormal = Executors.newScheduledThreadPool(1);
 
         lerProperties.scheduleAtFixedRate(new TaskLerProperties(context), 0, 10, TimeUnit.SECONDS);
-        criarViewExcluirVencidos.scheduleAtFixedRate(new TaskCriarViewExcluirInvalidos(context), 0, 24, TimeUnit.HOURS);
+        //criarViewExcluirVencidos.scheduleAtFixedRate(new TaskCriarViewExcluirInvalidos(context), 0, 24, TimeUnit.HOURS);
         //threadComunicacaoNormal.scheduleAtFixedRate(new TarefaComunicao(context,false), 2, 60, TimeUnit.SECONDS);
         //threadComunicacaoEmergencia.scheduleAtFixedRate(new TarefaComunicao(context,true), 3, 1800, TimeUnit.SECONDS);
-        criarPlayListDeterminados.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 4, 30, TimeUnit.SECONDS);
-        criarPlayListNormal.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 4, 30, TimeUnit.SECONDS);
+        //criarPlayListDeterminados.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 4, 30, TimeUnit.SECONDS);
+        //criarPlayListNormal.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 4, 30, TimeUnit.SECONDS);
 
     }
 
