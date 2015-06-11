@@ -47,7 +47,7 @@ public class BancoDAO {
     private static final String VIEW_PROGRAMACAO = "SELECT * FROM VIEW_CARREGAR_PROGRAMACAO";
     private static final String barraDoSistema = System.getProperty("file.separator");
     private static String caminho = Environment.getExternalStorageDirectory().toString();
-    private int valorRandom = 0;
+    private static int valorRandom = 0;
     private static Banco banco = new Banco();
     private static DatabaseHelper helper;
     private static SQLiteDatabase db;
@@ -1630,7 +1630,7 @@ public class BancoDAO {
     }
 
     ///---------------------------ATUALIZAR O BANCO DURANTE A REPRODUÇÃO ---------------------------------------------------------------///
-    public void atualizarBanco(File video, int tempoDoVideo, String tipoCategoria) {
+    public static void atualizarBanco(File video, int tempoDoVideo, String tipoCategoria) {
         if (arquivoBanco.exists()) {
             try {
                 int quantidadePlayer = pegarQtdePlayer(video.getName().trim(), tipoCategoria);
@@ -1641,7 +1641,7 @@ public class BancoDAO {
                 String ultimaExecucao = ultimaExecucao();
                 validarRandom(tipoCategoria);
 
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = getDb();
 
                 String sql = "";
                 if (tipoCategoria.equals("1")) {
@@ -1678,11 +1678,12 @@ public class BancoDAO {
         }
     }
 
-    private int pegarQtdePlayer(String arquivo, String tipoVideo) {
+    private static int pegarQtdePlayer(String arquivo, String tipoVideo) {
         int quantidade = 1;
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
+                Cursor cursorPegarQtdePlayer;
+                SQLiteDatabase db = getDb();
                 String sql = "";
 
                 if (tipoVideo.equals("1")) {
@@ -1691,13 +1692,13 @@ public class BancoDAO {
                     sql = "Select * from Comercial where Arquivo = '" + arquivo + "' LIMIT 1;";
                 }
 
-                cursor = db.rawQuery(sql, new String[]{});
-                if (cursor.getCount() > 0) {
-                    cursor.moveToFirst();
-                    if (null == cursor.getString(cursor.getColumnIndex("QtdePlayer"))) {
+                cursorPegarQtdePlayer = db.rawQuery(sql, new String[]{});
+                if (cursorPegarQtdePlayer.getCount() > 0) {
+                    cursorPegarQtdePlayer.moveToFirst();
+                    if (null == cursorPegarQtdePlayer.getString(cursorPegarQtdePlayer.getColumnIndex("QtdePlayer"))) {
                         quantidade = 1;
                     } else {
-                        quantidade = cursor.getInt(cursor.getColumnIndex("QtdePlayer")) + 1;
+                        quantidade = cursorPegarQtdePlayer.getInt(cursorPegarQtdePlayer.getColumnIndex("QtdePlayer")) + 1;
                     }
                 }
             } catch (SQLiteCantOpenDatabaseException e) {
@@ -1736,21 +1737,22 @@ public class BancoDAO {
         return quantidade;
     }
 
-    private String ultimaExecucao() {
+    private static String ultimaExecucao() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
 
-    private String data() {
+    private static String data() {
         return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
     }
 
-    private void validarRandom(String tipoCategoria) {
+    private static void validarRandom(String tipoCategoria) {
         Random random = new Random();
         int valor = random.nextInt(9999);
 
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
+                Cursor cursorValidarRandom;
+                SQLiteDatabase db = getDb();
                 String sql = "";
                 if (tipoCategoria.equals("1")) {
                     sql = "SELECT Arquivo FROM Video where Random = " + valor + " LIMIT 1";
@@ -1759,10 +1761,10 @@ public class BancoDAO {
                     sql = "SELECT Arquivo FROM Comercial where Random = " + valor + " LIMIT 1";
                 }
 
-                cursor = db.rawQuery(sql, new String[]{});
+                cursorValidarRandom = db.rawQuery(sql, new String[]{});
 
-                while ((cursor.getCount() > 0)) {
-                    LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 70 Ja existem o random " + valor);
+                while ((cursorValidarRandom.getCount() > 0)) {
+                    LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Ja existem o random " + valor);
                     validarRandom(tipoCategoria);
                     return;
                 }

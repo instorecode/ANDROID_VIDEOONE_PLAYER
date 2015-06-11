@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 import android.widget.VideoView;
+
+import com.banco.BancoDAO;
 import com.br.instore.utils.ConfiguaracaoUtils;
 import com.player.MainActivity;
 import com.player.R;
@@ -31,7 +33,6 @@ public class TaskPlayer implements Runnable {
     private MainActivity main;
     private Handler handler;
     private VideoView videoView;
-    //private BancoDAO bancoDAO;
     private Context context;
     private File arquivoVideo = null;
     public List<String> playlist = new ArrayList<String>();
@@ -389,22 +390,7 @@ public class TaskPlayer implements Runnable {
                 final String velocidade = line.split("\\|")[9];
                 final String tipoCategoria = line.split("\\|")[10];
                 arquivoVideo = new File(video);
-            } catch (InvalidParameterException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
-                run();
-            } catch (NullPointerException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
-                run();
-            } catch (Exception e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
-                run();
-            }
 
-
-            try {
                 if (!arquivoVideo.exists()) {
                     Toast.makeText(context, "Video " + arquivoVideo.getAbsolutePath() + " não existe", Toast.LENGTH_LONG).show();
                     handler.postDelayed(this, 10000);
@@ -443,6 +429,7 @@ public class TaskPlayer implements Runnable {
                         @Override
                         public void onCompletion(MediaPlayer mp) {
                             RegistrarLog.imprimirMsg("Log", "Atualiza o banco " + arquivoVideo.getAbsolutePath());
+                            BancoDAO.atualizarBanco(arquivoVideo, duracao, tipoCategoria);
                             run();
                         }
                     });
