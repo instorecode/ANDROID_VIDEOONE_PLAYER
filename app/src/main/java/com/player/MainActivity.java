@@ -1,24 +1,25 @@
 package com.player;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.TimerTask;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-
-import com.Tarefas.TaskComerciaisDeterminados;
-import com.Tarefas.TaskCriarViewExcluirInvalidos;
+import com.Tarefas.TarefaComunicao;
+import com.Tarefas.TaskBackup;
+import com.Tarefas.TaskBanco;
 import com.Tarefas.TaskLerProperties;
 import com.Tarefas.TaskPlayer;
 import com.Tarefas.TaskPlayerComericiaisDeterminados;
-import com.Tarefas.TaskVideoAndComerciais;
-import com.utils.RegistrarLog;
+import com.banco.BancoDAO;
+import com.timer.SimpleTimer;
+
+import it.sauronsoftware.ftp4j.FTPClient;
 
 public class MainActivity extends Activity {
     private Context context;
+    FTPClient ftp = new FTPClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,19 +28,51 @@ public class MainActivity extends Activity {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         context = getApplicationContext();
 
-        ScheduledExecutorService lerProperties = Executors.newScheduledThreadPool(1);
-        //ScheduledExecutorService criarViewExcluirVencidos = Executors.newScheduledThreadPool(1);
-        //ScheduledExecutorService threadComunicacaoNormal = Executors.newScheduledThreadPool(1);
-        //ScheduledExecutorService threadComunicacaoEmergencia = Executors.newScheduledThreadPool(1);
-        //ScheduledExecutorService criarPlayListDeterminados = Executors.newScheduledThreadPool(1);
-        //ScheduledExecutorService criarPlayListNormal = Executors.newScheduledThreadPool(1);
+        BancoDAO.getInstance(context);
+        SimpleTimer timer = new SimpleTimer();
 
-        lerProperties.scheduleAtFixedRate(new TaskLerProperties(context), 0, 10, TimeUnit.SECONDS);
-        //criarViewExcluirVencidos.scheduleAtFixedRate(new TaskCriarViewExcluirInvalidos(context), 0, 24, TimeUnit.HOURS);
-        //threadComunicacaoNormal.scheduleAtFixedRate(new TarefaComunicao(context,false), 2, 60, TimeUnit.SECONDS);
-        //threadComunicacaoEmergencia.scheduleAtFixedRate(new TarefaComunicao(context,true), 3, 1800, TimeUnit.SECONDS);
-        //criarPlayListDeterminados.scheduleAtFixedRate(new TaskComerciaisDeterminados(context), 4, 30, TimeUnit.SECONDS);
-        //criarPlayListNormal.scheduleAtFixedRate(new TaskVideoAndComerciais(context), 4, 30, TimeUnit.SECONDS);
+        final TaskLerProperties taskLerProperties = new TaskLerProperties(context);
+        timer.sched(new TimerTask() {
+            @Override
+            public void run() {
+                taskLerProperties.run();
+            }
+        }, 0, 10000l);
+
+        final TaskBackup taskBackup = new TaskBackup();
+        timer.sched(new TimerTask() {
+            @Override
+            public void run() {
+                taskBackup.run();
+            }
+        }, 3000l, (8 * (60 * (60 * (1 * 1000)))));
+
+        final TarefaComunicao tarefaComunicao = new TarefaComunicao();
+        timer.sched(new TimerTask() {
+            @Override
+            public void run() {
+                if(!ftp.isConnected()){
+                    tarefaComunicao.run(false, ftp);
+                }
+            }
+        }, 1000l, 180000l );
+
+        timer.sched(new TimerTask() {
+            @Override
+            public void run() {
+                if (!ftp.isConnected()) {
+                    tarefaComunicao.run(true, ftp);
+                }
+            }
+        }, 10000l, (30 * (60 * (1 * 1000))));
+
+        final TaskBanco taskBanco = new TaskBanco();
+        timer.sched(new TimerTask() {
+            @Override
+            public void run() {
+                taskBanco.run();
+            }
+        }, 3000l, 120000);
 
     }
 

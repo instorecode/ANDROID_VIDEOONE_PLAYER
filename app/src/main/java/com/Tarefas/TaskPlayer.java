@@ -1,6 +1,5 @@
 package com.Tarefas;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Environment;
@@ -8,9 +7,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 import android.widget.VideoView;
-import com.banco.BancoDAO;
 import com.br.instore.utils.ConfiguaracaoUtils;
-import com.br.instore.utils.LogUtils;
 import com.player.MainActivity;
 import com.player.R;
 import com.utils.AndroidImprimirUtils;
@@ -22,23 +19,19 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.security.InvalidParameterException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-
 
 public class TaskPlayer implements Runnable {
 
     private MainActivity main;
     private Handler handler;
     private VideoView videoView;
-    private BancoDAO bancoDAO;
+    //private BancoDAO bancoDAO;
     private Context context;
     private File arquivoVideo = null;
     public List<String> playlist = new ArrayList<String>();
@@ -47,6 +40,7 @@ public class TaskPlayer implements Runnable {
     private boolean videoVazio = true;
     private int duracao = 60000;
     private Object obj;
+    private boolean vaiReproduzir = true;
 
     public TaskPlayer(MainActivity mainActivity, Handler handler, Context context, Object obj) {
         this.main = mainActivity;
@@ -56,223 +50,280 @@ public class TaskPlayer implements Runnable {
     }
 
 
-
     @Override
     public void run() {
-        //Toast.makeText(context, playlist.size() + "", Toast.LENGTH_SHORT).show();
-        RandomAccessFile reader = null;
-        String load = "";
-        try {
-            reader = new RandomAccessFile("/proc/meminfo", "r");
-            load = reader.readLine();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        try {
-            String a = load.replaceAll("\\s", "").trim();
-            RegistrarLog.imprimirMsg("Log", a);
-            String b = load.split(":")[1];
-            RegistrarLog.imprimirMsg("Log", b);
-            String c = b.split("k")[0];
-            RegistrarLog.imprimirMsg("Log", c.trim());
-
-            long total = Long.parseLong(c.trim());
-            total = total / 1024L;
-            RegistrarLog.imprimirMsg("Log", total + "");
-            Toast.makeText(context, total + " TOTAL RAM", Toast.LENGTH_LONG).show();
-        } catch (Exception e){
-            AndroidImprimirUtils.imprimirErro(TaskPlayer.class,e);
-        }
-
-        if (playlist == null || playlist.isEmpty() || playlist.size()  == 0) {
+        if (playlist == null || playlist.isEmpty() || playlist.size() == 0) {
+            RegistrarLog.imprimirMsg("Log", "PlayList não tem linhas");
             lerLinhas();
             if (videoVazio) {
+                RegistrarLog.imprimirMsg("Log", "Sem video para tocar");
                 executar(null);
                 return;
             } else {
+                RegistrarLog.imprimirMsg("Log", "Tem video a tocar");
                 String linha = playlist.get(0);
-                String flag = linha.split("\\|")[0];
-                if (flag.equals("det") || flag.contains("det")) {
-                    playlist = new ArrayList(playlist.subList(1, playlist.size()));
-                    executar(linha);
-                    return;
-                } else {
-                    boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
-                    if (retornoHorarioDaLinha) {
+
+                try {
+                    String flag = linha.split("\\|")[0];
+                    if (flag.equals("det") || flag.contains("det")) {
+                        RegistrarLog.imprimirMsg("Log", "Video que vai tocar é Determinado");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(linha);
                         return;
                     } else {
+                        RegistrarLog.imprimirMsg("Log", "Video que vai tocar é normal");
+                        boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
+                        if (retornoHorarioDaLinha) {
+                            RegistrarLog.imprimirMsg("Log", "Video está com horario valido pode tocar");
+                            playlist = new ArrayList(playlist.subList(1, playlist.size()));
+                            executar(linha);
+                            return;
+                        } else {
+                            RegistrarLog.imprimirMsg("Log", "Video não está com horario valido");
+                            playlist = new ArrayList(playlist.subList(1, playlist.size()));
+                            executar(null);
+                            return;
+                        }
+                    }
+                } catch (InvalidParameterException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                    run();
+                } catch (NullPointerException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                    run();
+                } catch (Exception e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                    run();
+                }
+            }
+        } else {
+            RegistrarLog.imprimirMsg("Log", "PlayList tem itens ");
+            String linha = playlist.get(0);
+            try {
+                String flag = linha.split("\\|")[0];
+                if (flag.equals("det") || flag.contains("det")) {
+                    RegistrarLog.imprimirMsg("Log", "PlayList com itens || Video que vai tocar é Determinado");
+                    playlist = new ArrayList(playlist.subList(1, playlist.size()));
+                    executar(linha);
+                    return;
+                } else {
+                    RegistrarLog.imprimirMsg("Log", "PlayList com itens || Video que vai tocar é normal");
+
+                    boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
+                    if (retornoHorarioDaLinha) {
+                        RegistrarLog.imprimirMsg("Log", "PlayList com itens || Video está com horario valido pode tocar");
+                        playlist = new ArrayList(playlist.subList(1, playlist.size()));
+                        executar(linha);
+                        return;
+                    } else {
+                        RegistrarLog.imprimirMsg("Log", "PlayList com itens || Video não está com horario valido");
                         playlist = new ArrayList(playlist.subList(1, playlist.size()));
                         executar(null);
                         return;
                     }
                 }
-
-            }
-        } else {
-            String linha = playlist.get(0);
-            String flag = linha.split("\\|")[0];
-            if (flag.equals("det") || flag.contains("det")) {
-                playlist = new ArrayList(playlist.subList(1, playlist.size()));
-                executar(linha);
-                return;
-            } else {
-                boolean retornoHorarioDaLinha = verificarHorarioProgramacao(linha.split("\\|")[1], linha.split("\\|")[2]);
-                if (retornoHorarioDaLinha) {
-                    playlist = new ArrayList(playlist.subList(1, playlist.size()));
-                    executar(linha);
-                    return;
-                } else {
-                    playlist = new ArrayList(playlist.subList(1, playlist.size()));
-                    executar(null);
-                    return;
-                }
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                run();
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                run();
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                run();
             }
         }
     }
 
     private void lerLinhas() {
-        String caminhoPlaylist = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlist.exp");
-        File arquivoPlaylist = new File(caminhoPlaylist);
-        if (arquivoPlaylist.exists()) {
-            FileReader fileReader = null;
-            try {
-                fileReader = new FileReader(arquivoPlaylist);
-            } catch (FileNotFoundException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-            } catch (NullPointerException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-            } catch (InvalidParameterException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-            } catch (Exception e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-            }
+        if (null != ConfiguaracaoUtils.diretorio.getDiretorioPlaylist() && !ConfiguaracaoUtils.diretorio.getDiretorioPlaylist().trim().replaceAll("\\s", "").isEmpty()) {
 
-            BufferedReader bf = new BufferedReader(fileReader);
-            String line = "";
-            try {
-                while (null != (line = bf.readLine())) {
-                    if (line.contains("semVideo") && line.equals("semVideo")) {
-                        videoVazio = true;
-                        break;
-                    } else {
-                        playlist.add(line);
-                        videoVazio = false;
+            String caminhoPlaylist = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlist.exp");
+            RegistrarLog.imprimirMsg("Log", caminhoPlaylist);
+            if (null != caminhoPlaylist && !caminhoPlaylist.trim().replaceAll("\\s", "").isEmpty()) {
+
+                File arquivoPlaylist = new File(caminhoPlaylist);
+
+                if (arquivoPlaylist.exists()) {
+                    RegistrarLog.imprimirMsg("Log", "ARQUIVO PLAYLIST EXISTE");
+                    FileReader fileReader = null;
+                    try {
+                        fileReader = new FileReader(arquivoPlaylist);
+                    } catch (FileNotFoundException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                    } catch (NullPointerException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                    } catch (InvalidParameterException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                    } catch (Exception e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
                     }
-                }
-            } catch (IOException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
 
-            } catch (NullPointerException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (InvalidParameterException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (Exception e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } finally {
-                try {
-                    bf.close();
-                } catch (IOException e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                    return;
-                } catch (NullPointerException e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                    return;
-                } catch (InvalidParameterException e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                    return;
-                } catch (Exception e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                    return;
-                }
+                    BufferedReader bf = new BufferedReader(fileReader);
+                    String line = "";
+                    try {
+                        while (null != (line = bf.readLine())) {
+                            if (line.contains("semVideo") || line.equals("semVideo") || line.trim().replaceAll("\\s", "").isEmpty()) {
+                                videoVazio = true;
+                                break;
+                            } else {
+                                playlist.add(line);
+                                videoVazio = false;
+                            }
+                        }
+                    } catch (IOException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (NullPointerException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (InvalidParameterException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (Exception e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } finally {
+                        try {
+                            bf.close();
+                        } catch (IOException e) {
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                            return;
+                        } catch (NullPointerException e) {
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                            return;
+                        } catch (InvalidParameterException e) {
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                            return;
+                        } catch (Exception e) {
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                            return;
+                        }
 
-                try {
-                    fileReader.close();
-                } catch (IOException e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                    return;
-                } catch (NullPointerException e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                    return;
-                } catch (InvalidParameterException e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                    return;
-                } catch (Exception e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                    return;
+                        try {
+                            fileReader.close();
+                        } catch (IOException e) {
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                            return;
+                        } catch (NullPointerException e) {
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                            return;
+                        } catch (InvalidParameterException e) {
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                            return;
+                        } catch (Exception e) {
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                            AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                            return;
+                        }
+                    }
+                } else {
+                    try {
+                        arquivoPlaylist.createNewFile();
+                    } catch (IOException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (NullPointerException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (InvalidParameterException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (Exception e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    }
+
+                    FileWriter fileWriter = null;
+                    try {
+                        fileWriter = new FileWriter(arquivoPlaylist, true);
+                    } catch (IOException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (NullPointerException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (InvalidParameterException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (Exception e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    }
+
+                    try {
+                        fileWriter.write("semVideo");
+                    } catch (IOException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (NullPointerException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (InvalidParameterException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (Exception e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    }
+
+                    try {
+                        fileWriter.close();
+                    } catch (IOException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (NullPointerException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (InvalidParameterException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    } catch (Exception e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                        return;
+                    }
                 }
             }
         } else {
-            try {
-                arquivoPlaylist.createNewFile();
-            } catch (IOException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (NullPointerException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (InvalidParameterException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (Exception e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            }
-
-            FileWriter fileWriter = null;
-            try {
-                fileWriter = new FileWriter(arquivoPlaylist, true);
-            } catch (IOException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (NullPointerException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (InvalidParameterException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (Exception e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            }
-
-            try {
-                fileWriter.write("semVideo");
-            } catch (IOException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (NullPointerException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (InvalidParameterException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (Exception e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            }
-
-            try {
-                fileWriter.close();
-            } catch (IOException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (NullPointerException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (InvalidParameterException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            } catch (Exception e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayer.this, e);
-                return;
-            }
+            RegistrarLog.imprimirMsg("Log", "Ainda não tem a informação do diretorio de playList");
+            handler.postDelayed(this, 2000);
         }
     }
 
@@ -328,56 +379,87 @@ public class TaskPlayer implements Runnable {
             videoView.destroyDrawingCache();
             videoView.setVisibility(View.INVISIBLE);
             videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-            handler.postDelayed(this, 1000);
+            handler.postDelayed(this, 10000);
 
         } else {
-            final String video = line.split("\\|")[3];
-            final String titulo = line.split("\\|")[7];
-            final String categoria = line.split("\\|")[8];
-            final String velocidade = line.split("\\|")[9];
-            final String tipoCategoria = line.split("\\|")[10];
-            arquivoVideo = new File(video);
-            videoView = (VideoView) main.findViewById(R.id.video);
-            videoView.setVisibility(View.VISIBLE);
-            videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-            videoView.setVideoPath(arquivoVideo.getAbsolutePath());
-            videoView.requestFocus();
-            videoView.clearAnimation();
+            try {
+                final String video = line.split("\\|")[3];
+                final String titulo = line.split("\\|")[7];
+                final String categoria = line.split("\\|")[8];
+                final String velocidade = line.split("\\|")[9];
+                final String tipoCategoria = line.split("\\|")[10];
+                arquivoVideo = new File(video);
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                run();
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                run();
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 90);
+                run();
+            }
 
-            bancoDAO = new BancoDAO(context);
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                public void onPrepared(MediaPlayer mp) {
-                    duracao = videoView.getDuration();
-                    Toast.makeText(context, arquivoVideo + " " + new SimpleDateFormat("HH:mm:ss").format(new Date()), Toast.LENGTH_LONG).show();
-                    bancoDAO.atualizarBanco(arquivoVideo, duracao, tipoCategoria);
-                    bancoDAO.close();
+
+            try {
+                if (!arquivoVideo.exists()) {
+                    Toast.makeText(context, "Video " + arquivoVideo.getAbsolutePath() + " não existe", Toast.LENGTH_LONG).show();
+                    handler.postDelayed(this, 10000);
+                } else {
+                    RegistrarLog.imprimirMsg("Log", arquivoVideo.getAbsolutePath());
+                    videoView = (VideoView) main.findViewById(R.id.video);
+                    videoView.setVisibility(View.VISIBLE);
+                    videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+                    videoView.setVideoPath(arquivoVideo.getAbsolutePath());
+                    videoView.requestFocus();
+                    videoView.clearAnimation();
                     videoView.requestFocus();
                     videoView.start();
+
+                    videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                        @Override
+                        public boolean onError(MediaPlayer mp, int what, int extra) {
+                            vaiReproduzir = false;
+                            RegistrarLog.imprimirMsg("Log", "DEU ERRO" + arquivoVideo.getAbsolutePath());
+                            videoView.destroyDrawingCache();
+                            videoView.setVisibility(View.INVISIBLE);
+                            videoView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+                            run();
+                            return true;
+                        }
+                    });
+
+
+                    videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        public void onPrepared(MediaPlayer mp) {
+                            duracao = videoView.getDuration();
+                        }
+                    });
+
+                    videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            RegistrarLog.imprimirMsg("Log", "Atualiza o banco " + arquivoVideo.getAbsolutePath());
+                            run();
+                        }
+                    });
                 }
-            });
-
-            videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    DateFormat df = new SimpleDateFormat("HH:mm:ss");
-                    df.setTimeZone(TimeZone.getTimeZone("GMT+0"));
-                    String duracaoDoVideo = df.format(new Date(duracao));
-                    LogUtils.registrar(02, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 02 Tocou o video: " + video + "@" + titulo + "@" + categoria + "@" + velocidade + "@" + duracaoDoVideo);
-
-                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                    ActivityManager activityManager = (ActivityManager) obj;
-                    activityManager.getMemoryInfo(mi);
-                    long availableMegs = mi.availMem / 1048576L;
-                    RegistrarLog.imprimirMsg("Log", availableMegs + " RAM");
-                    try {
-                        Toast.makeText(context, availableMegs + " RAM", Toast.LENGTH_SHORT).show();
-                    } catch (Exception e){
-                        AndroidImprimirUtils.imprimirErro(TaskPlayer.class,e);
-                    }
-
-                    run();
-                    return;
-                }
-            });
+            } catch (InvalidParameterException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 20);
+                handler.postDelayed(this, 10000);
+            } catch (NullPointerException e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 20);
+                handler.postDelayed(this, 10000);
+            } catch (Exception e) {
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e);
+                AndroidImprimirUtils.imprimirErro(TaskPlayer.class, e, 20);
+                handler.postDelayed(this, 10000);
+            }
         }
     }
 
@@ -388,6 +470,4 @@ public class TaskPlayer implements Runnable {
     public List<String> getPlaylist() {
         return playlist;
     }
-
-
 }

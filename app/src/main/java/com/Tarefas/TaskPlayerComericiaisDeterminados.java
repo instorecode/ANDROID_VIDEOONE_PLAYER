@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.os.Handler;
 import com.br.instore.utils.ConfiguaracaoUtils;
 import com.utils.AndroidImprimirUtils;
+import com.utils.RegistrarLog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -117,65 +118,88 @@ public class TaskPlayerComericiaisDeterminados implements Runnable {
     }
 
     private void lerLinha() {
-        String caminnhoPlaylistDet = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlistDet.exp");
-        File arquivoPlaylistDet = new File(caminnhoPlaylistDet);
-        if (arquivoPlaylistDet.exists()) {
-            FileReader fileReader = null;
-            try {
-                fileReader = new FileReader(arquivoPlaylistDet);
-            } catch (FileNotFoundException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-            } catch (NullPointerException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-            } catch (InvalidParameterException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-            } catch (Exception e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-            }
-
-            BufferedReader bf = new BufferedReader(fileReader);
-            String line = "";
-            try {
-                while (null != (line = bf.readLine())) {
-                    if (line.contains("semVideo") || line.equals("semVideo")) {
-                        listaLerLinha.clear();
-                        break;
-                    } else {
-                        listaLerLinha.add(line);
-                    }
-                }
-            } catch (IOException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-            } catch (NullPointerException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-            } catch (InvalidParameterException e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-            } catch (Exception e) {
-                AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-            } finally {
+        if(null != ConfiguaracaoUtils.diretorio.getDiretorioPlaylist() && !ConfiguaracaoUtils.diretorio.getDiretorioPlaylist().trim().replaceAll("\\s","").isEmpty()) {
+            String caminnhoPlaylistDet = caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlistDet.exp");
+            File arquivoPlaylistDet = new File(caminnhoPlaylistDet);
+            if (arquivoPlaylistDet.exists()) {
+                FileReader fileReader = null;
                 try {
-                    bf.close();
-                } catch (IOException e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-                 } catch (NullPointerException e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-                } catch (InvalidParameterException e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-                } catch (Exception e) {
-                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
-                }
-                try {
-                    fileReader.close();
+                    fileReader = new FileReader(arquivoPlaylistDet);
                 } catch (FileNotFoundException e) {
                     AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
                 } catch (NullPointerException e) {
                     AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
                 } catch (InvalidParameterException e) {
                     AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
                 } catch (Exception e) {
                     AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                }
+
+                BufferedReader bf = new BufferedReader(fileReader);
+                String line = "";
+                try {
+                    while (null != (line = bf.readLine())) {
+                        if (line.contains("semVideo") || line.equals("semVideo")) {
+                            listaLerLinha.clear();
+                            break;
+                        } else {
+                            listaLerLinha.add(line);
+                        }
+                    }
+                } catch (IOException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                } catch (NullPointerException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                } catch (InvalidParameterException e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                } catch (Exception e) {
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                    AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                } finally {
+                    try {
+                        bf.close();
+                    } catch (IOException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                    } catch (NullPointerException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                    } catch (InvalidParameterException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                    } catch (Exception e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                    }
+                    try {
+                        fileReader.close();
+                    } catch (FileNotFoundException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                    } catch (NullPointerException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                    } catch (InvalidParameterException e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                    } catch (Exception e) {
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.this, e);
+                        AndroidImprimirUtils.imprimirErro(TaskPlayerComericiaisDeterminados.class, e, 90);
+                    }
                 }
             }
+
+        } else {
+            RegistrarLog.imprimirMsg("Log", "Ainda não tem a informação do diretorio de playList");
+            handler.postDelayed(this, 2000);
         }
     }
+
 }

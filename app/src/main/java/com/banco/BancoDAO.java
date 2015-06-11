@@ -38,61 +38,60 @@ import java.util.Random;
 import java.util.TimeZone;
 
 public class BancoDAO {
-
-    private final File arquivoBanco = new File(Environment.getExternalStorageDirectory().getAbsolutePath().concat("/videoOne/").concat("videoOneDs.db"));
-
-    private List<ProgramacaoExp> listaProgramacao = new ArrayList<ProgramacaoExp>();
-    private List<String> listaDeArquivos = new ArrayList<String>();
-    private List<ComercialDet> listaComercialDeterminados = new ArrayList<ComercialDet>();
-    private List<String> linhasPlaylistDet = new ArrayList<String>();
-    private String teste = "a";
-    private Banco banco = new Banco();
-    private ExpUtils expUtils = new ExpUtils();
-    private Cursor cursor;
-    private DatabaseHelper helper;
-    private SQLiteDatabase db;
-
+    private static final File arquivoBanco = new File(Environment.getExternalStorageDirectory().getAbsolutePath().concat("/videoOne/").concat("videoOneDs.db"));
+    private static List<ProgramacaoExp> listaProgramacao = new ArrayList<ProgramacaoExp>();
+    private static List<String> listaDeArquivos = new ArrayList<String>();
+    private static List<ComercialDet> listaComercialDeterminados = new ArrayList<ComercialDet>();
+    private static List<String> linhasPlaylistDet = new ArrayList<String>();
+    private static ExpUtils expUtils = new ExpUtils();
     private static final String VIEW_PROGRAMACAO = "SELECT * FROM VIEW_CARREGAR_PROGRAMACAO";
-    private final String barraDoSistema = System.getProperty("file.separator");
-    private String caminho = Environment.getExternalStorageDirectory().toString();
+    private static final String barraDoSistema = System.getProperty("file.separator");
+    private static String caminho = Environment.getExternalStorageDirectory().toString();
     private int valorRandom = 0;
+    private static Banco banco = new Banco();
+    private static DatabaseHelper helper;
+    private static SQLiteDatabase db;
+    private static Cursor cursor;
+    private static BancoDAO bancoDAO;
 
-
-    public BancoDAO(Context context) {
+    private BancoDAO(Context context){
         this.helper = new DatabaseHelper(context);
     }
 
-    public SQLiteDatabase getDb() {
+    public static void getInstance(Context context){
+        if(null == bancoDAO){
+            bancoDAO = new BancoDAO(context);
+        }
+    }
+
+    public static SQLiteDatabase getDb() {
         if (null == db) {
             db = helper.getWritableDatabase();
         }
         return db;
     }
 
-    public void close() {
+    public static void close() {
+        db = null;
         helper.close();
     }
 
     ///------------------ VIDEOS COMERCIAIS -------------------///
-    public void programacoes() {
+    public static void programacoes() {
         if (arquivoBanco.exists()) {
-            SQLiteDatabase db = helper.getWritableDatabase();
+            SQLiteDatabase db = getDb();
             cursor = db.rawQuery(VIEW_PROGRAMACAO, new String[]{});
             if (cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
                     try {
                         ProgramacaoExp programacaoExp = new ProgramacaoExp();
                         programacaoExp.descricao = cursor.getString(cursor.getColumnIndex("Descricao"));
-                        String ano = cursor.getString(cursor.getColumnIndex("Ano")).trim();
-                        String mes = cursor.getString(cursor.getColumnIndex("mesInicialFormatado")).trim();
-                        String dia = cursor.getString(cursor.getColumnIndex("diaInicialFormatado")).trim();
-                        programacaoExp.dataInicial = ano + "-" + mes + "-" + dia;
-
-                        String anoF = cursor.getString(cursor.getColumnIndex("Anof")).trim();
-                        String mesF = cursor.getString(cursor.getColumnIndex("mesfInicialFormatado")).trim();
-                        String diaF = cursor.getString(cursor.getColumnIndex("diafInicialFormatado")).trim();
-                        programacaoExp.dataFinal = anoF + "-" + mesF + "-" + diaF;
-
+                        programacaoExp.anoInicial = cursor.getString(cursor.getColumnIndex("Ano")).trim();
+                        programacaoExp.mesInicial = cursor.getString(cursor.getColumnIndex("mesInicialFormatado")).trim();
+                        programacaoExp.diaInicial = cursor.getString(cursor.getColumnIndex("diaInicialFormatado")).trim();
+                        programacaoExp.anoFinal = cursor.getString(cursor.getColumnIndex("Anof")).trim();
+                        programacaoExp.mesFinal = cursor.getString(cursor.getColumnIndex("mesfInicialFormatado")).trim();
+                        programacaoExp.diaInicial = cursor.getString(cursor.getColumnIndex("diafInicialFormatado")).trim();
                         programacaoExp.horarioInicio = cursor.getString(cursor.getColumnIndex("HoraInicio"));
                         programacaoExp.horarioFinal = cursor.getString(cursor.getColumnIndex("HoraFinal"));
                         programacaoExp.diaDaSemana = cursor.getString(cursor.getColumnIndex("DiaSemana"));
@@ -121,7 +120,6 @@ public class BancoDAO {
                         programacaoExp.categoria23 = cursor.getString(cursor.getColumnIndex("Categoria23"));
                         programacaoExp.categoria24 = cursor.getString(cursor.getColumnIndex("Categoria24"));
                         programacaoExp.conteudo = cursor.getString(cursor.getColumnIndex("Conteudo"));
-
                         listaProgramacao.add(programacaoExp);
                     } catch (SQLiteCantOpenDatabaseException e) {
                         AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
@@ -163,12 +161,11 @@ public class BancoDAO {
                 return;
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : programacoes()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : programacoes()");
         }
     }
 
-    private void categorias() {
+    private static void categorias() {
         if (null != listaProgramacao && !listaProgramacao.isEmpty()) {
             for (ProgramacaoExp p : listaProgramacao) {
                 codigoCategoria(p.categoria1, p.horarioInicio, p.horarioFinal);
@@ -210,18 +207,18 @@ public class BancoDAO {
 
     }
 
-    private void codigoCategoria(String codigo, String horaInicialProgramacao, String horaFinalProgramacao) {
+    private static void codigoCategoria(String codigo, String horaInicialProgramacao, String horaFinalProgramacao) {
         if (arquivoBanco.exists()) {
             try {
                 if (null != codigo && null != horaFinalProgramacao && null != horaInicialProgramacao && !codigo.equals("0")) {
-                    SQLiteDatabase db1 = helper.getWritableDatabase();
+                    SQLiteDatabase db = getDb();
                     String scriptCategoria = "SELECT * FROM Categoria WHERE Codigo = '" + codigo + "' AND date('now') >= dataInicio AND date('now') < dataFinal";
-                    Cursor cursorT = db1.rawQuery(scriptCategoria, new String[]{});
-                    if (cursorT.getCount() > 0) {
-                        while (cursorT.moveToNext()) {
+                    Cursor cursorCodigosCategoria = db.rawQuery(scriptCategoria, new String[]{});
+                    if (cursorCodigosCategoria.getCount() > 0) {
+                        while (cursorCodigosCategoria.moveToNext()) {
                             try {
-                                String codigoCategoria = cursorT.getString(cursorT.getColumnIndex("Codigo"));
-                                String tipoCategoria = cursorT.getString(cursorT.getColumnIndex("Tipo"));
+                                String codigoCategoria = cursorCodigosCategoria.getString(cursorCodigosCategoria.getColumnIndex("Codigo"));
+                                String tipoCategoria = cursorCodigosCategoria.getString(cursorCodigosCategoria.getColumnIndex("Tipo"));
                                 if (tipoCategoria.equals("1")) {
                                     video(codigoCategoria, horaInicialProgramacao, horaFinalProgramacao);
                                 } else if (tipoCategoria.equals("2")) {
@@ -257,9 +254,9 @@ public class BancoDAO {
                                 continue;
                             }
                         }
+                        cursorCodigosCategoria.close();
                     }
-                    cursorT.close();
-                    db1.close();
+
                 }
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
@@ -272,22 +269,19 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : codigoCategoria()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : codigoCategoria()");
         }
     }
 
-    private void video(String codigoCategoria, String horaInicial, String horaFinal) {
+    private static void video(String codigoCategoria, String horaInicial, String horaFinal) {
         if (arquivoBanco.exists()) {
             try {
                 String scriptVideo = "SELECT * FROM VIEW_CARREGAR_VIDEOS WHERE (Categoria1 = " + codigoCategoria + " OR Categoria2 = " + codigoCategoria + " OR Categoria3 = " + codigoCategoria + " )";
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = getDb();
                 cursor = db.rawQuery(scriptVideo, new String[]{});
-
                 if (cursor.getCount() > 0) {
                     while (cursor.moveToNext()) {
                         try {
-
                             String arquivo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
                             String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
                             String velocidade = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Velocidade")));
@@ -296,7 +290,7 @@ public class BancoDAO {
                                 listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivoDeVideo + "|0|0|" + caminhoDoArquivoDeVideo + "|" + titulo + "|" + codigoCategoria + "|" + velocidade + "|1");
                                 return;
                             } else {
-                                LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. O video " + arquivo + " não foi encontrado em nenhum diretório");
+                                LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. O video " + arquivo + " não foi encontrado em nenhum diretório");
                             }
 
                         } catch (SQLiteCantOpenDatabaseException e) {
@@ -341,29 +335,27 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : video()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : video()");
         }
     }
 
-    private void comercial(String codigoCategoria, String horaInicial, String horaFinal) {
+    private static void comercial(String codigoCategoria, String horaInicial, String horaFinal) {
         if (arquivoBanco.exists()) {
             try {
                 if (null != codigoCategoria && null != horaInicial && null != horaFinal) {
-                    SQLiteDatabase db = helper.getWritableDatabase();
+                    SQLiteDatabase db = getDb();
                     String scriptCategoria = "SELECT * FROM VIEW_CARREGAR_COMERCIAL WHERE (QtdePlayer is null OR QtdePlayer > Qtde) AND  Categoria = " + codigoCategoria;
-                    cursor = db.rawQuery(scriptCategoria, new String[]{});
-                    if (cursor.getCount() > 0) {
-                        while (cursor.moveToNext()) {
+                    Cursor cursorComercial = db.rawQuery(scriptCategoria, new String[]{});
+                    if (cursorComercial.getCount() > 0) {
+                        while (cursorComercial.moveToNext()) {
                             try {
-
-                                String arquivo = cursor.getString(cursor.getColumnIndex("Arquivo"));
-                                String diasAlternados = cursor.getString(cursor.getColumnIndex("DiasAlternados"));
-                                String dataStr = cursor.getString(cursor.getColumnIndex("Data"));
-                                String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                                String dependencia1 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
-                                String dependencia2 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
-                                String dependencia3 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
+                                String arquivo = cursorComercial.getString(cursorComercial.getColumnIndex("Arquivo"));
+                                String diasAlternados = cursorComercial.getString(cursorComercial.getColumnIndex("DiasAlternados"));
+                                String dataStr = cursorComercial.getString(cursorComercial.getColumnIndex("Data"));
+                                String titulo = StringUtils.nuloParaVazio(cursorComercial.getString(cursorComercial.getColumnIndex("Titulo")));
+                                String dependencia1 = StringUtils.nuloParaVazio(cursorComercial.getString(cursorComercial.getColumnIndex("Dependencia1")));
+                                String dependencia2 = StringUtils.nuloParaVazio(cursorComercial.getString(cursorComercial.getColumnIndex("Dependencia2")));
+                                String dependencia3 = StringUtils.nuloParaVazio(cursorComercial.getString(cursorComercial.getColumnIndex("Dependencia3")));
                                 boolean comercialEvalido = validarDiasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria, dataStr, diasAlternados);
                                 if (comercialEvalido) {
                                     break;
@@ -412,12 +404,11 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : comercial()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : comercial()");
         }
     }
 
-    private boolean validarDiasComercial(String arquivo, String titulo, String dependencia1, String dependencia2, String dependencia3, String horaInicial, String horaFinal, String codigoCategoria, String dataStr, String diasAlternados) {
+    private static boolean validarDiasComercial(String arquivo, String titulo, String dependencia1, String dependencia2, String dependencia3, String horaInicial, String horaFinal, String codigoCategoria, String dataStr, String diasAlternados) {
         Date data = null;
         if (null != dataStr) {
             try {
@@ -441,7 +432,7 @@ public class BancoDAO {
                 }
             } else {
                 if (diaQueTocou.get(Calendar.DAY_OF_MONTH) == diaAtual.get(Calendar.DAY_OF_MONTH)) {
-                    LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. O comercial " + arquivo + " não pode ser tocado devido ter sido cadastrado como dias alternados");
+                    LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. O comercial " + arquivo + " não pode ser tocado devido ter sido cadastrado como dias alternados");
                     return false;
                 } else {
                     boolean comercialEDependenciasExistemNosDiretoriosEBanco = validarDependenciasComercial(arquivo, titulo, dependencia1, dependencia2, dependencia3, horaInicial, horaFinal, codigoCategoria);
@@ -454,15 +445,15 @@ public class BancoDAO {
         return false;
     }
 
-    private boolean validarDependenciasComercial(String arquivo, String titulo, String dependencia1, String dependencia2, String dependencia3, String horaInicial, String horaFinal, String codigoCategoria) {
+    private static boolean validarDependenciasComercial(String arquivo, String titulo, String dependencia1, String dependencia2, String dependencia3, String horaInicial, String horaFinal, String codigoCategoria) {
         if (!dependencia1.trim().toLowerCase().contains("nenhuma")) {
             String caminhoDoArquivo = validarExistenciaDoVideo(dependencia1);
             if (caminhoDoArquivo == null) {
-                LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A Dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
+                LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A Dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
             } else {
                 ComercialDependencia cd = validarDependenciaNoBanco(dependencia1);
                 if (cd == null) {
-                    LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrada no banco");
+                    LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A dependência " + dependencia1 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
                     listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|1|0|" + arquivo + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
@@ -472,11 +463,11 @@ public class BancoDAO {
         if (!dependencia2.trim().toLowerCase().contains("nenhuma")) {
             String caminhoDoArquivo = validarExistenciaDoVideo(dependencia2);
             if (caminhoDoArquivo == null) {
-                LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A Dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
+                LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A Dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
             } else {
                 ComercialDependencia cd = validarDependenciaNoBanco(dependencia2);
                 if (cd == null) {
-                    LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrada no banco");
+                    LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A dependência " + dependencia2 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
                     listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|1|0|" + arquivo + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
@@ -486,11 +477,11 @@ public class BancoDAO {
         if (!dependencia3.trim().toLowerCase().contains("nenhuma")) {
             String caminhoDoArquivo = validarExistenciaDoVideo(dependencia2);
             if (caminhoDoArquivo == null) {
-                LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A Dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
+                LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A Dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrado em nenhum diretório");
             } else {
                 ComercialDependencia cd = validarDependenciaNoBanco(dependencia3);
                 if (cd == null) {
-                    LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrada no banco");
+                    LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A dependência " + dependencia3 + " do arquivo " + arquivo + " não foi encontrada no banco");
                 } else {
                     listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|1|0|" + arquivo + "|" + cd.titulo + "|" + cd.categoria + "|0|2");
                 }
@@ -499,7 +490,7 @@ public class BancoDAO {
 
         String caminhoDoArquivo = validarExistenciaDoVideo(arquivo);
         if (caminhoDoArquivo == null) {
-            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. O arquivo " + arquivo + " não foi encontrado em nenhum diretório");
+            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. O arquivo " + arquivo + " não foi encontrado em nenhum diretório");
         } else {
             listaDeArquivos.add("normal|" + horaInicial + "|" + horaFinal + "|" + caminhoDoArquivo + "|0|0|" + arquivo + "|" + titulo + "|" + codigoCategoria + "|0|2");
             return true;
@@ -508,18 +499,18 @@ public class BancoDAO {
         return false;
     }
 
-    private ComercialDependencia validarDependenciaNoBanco(String nome) {
+    private static ComercialDependencia validarDependenciaNoBanco(String nome) {
         if (arquivoBanco.exists()) {
             try {
                 if (null != nome && !nome.replaceAll("\\s", "").trim().isEmpty()) {
                     try {
-                        SQLiteDatabase db = helper.getWritableDatabase();
+                        SQLiteDatabase db = getDb();
                         String script = "SELECT * FROM VIEW_CARREGAR_COMERCIAL WHERE Arquivo = '" + nome + "'";
-                        cursor = db.rawQuery(script, new String[]{});
-                        if (cursor.moveToFirst()) {
-                            String arquivo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
-                            String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                            String categoria = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Categoria")));
+                        Cursor cursorComercialDependencia = db.rawQuery(script, new String[]{});
+                        if (cursorComercialDependencia.moveToFirst()) {
+                            String arquivo = StringUtils.nuloParaVazio(cursorComercialDependencia.getString(cursorComercialDependencia.getColumnIndex("Arquivo")));
+                            String titulo = StringUtils.nuloParaVazio(cursorComercialDependencia.getString(cursorComercialDependencia.getColumnIndex("Titulo")));
+                            String categoria = StringUtils.nuloParaVazio(cursorComercialDependencia.getString(cursorComercialDependencia.getColumnIndex("Categoria")));
 
                             ComercialDependencia cd = new ComercialDependencia();
                             cd.arquivo = arquivo;
@@ -561,13 +552,12 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : validarDependenciaNoBanco()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : validarDependenciaNoBanco()");
         }
         return null;
     }
 
-    public void criarArquivoPlaylist() {
+    public static void criarArquivoPlaylist() {
         File playlistAntiga = new File(caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlist.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();
@@ -684,83 +674,83 @@ public class BancoDAO {
     }
 
     ///----------------- COMERCIAL DETERMINADO ----------///
-    public void comerciaisDeterminados() {
+    public static void comerciaisDeterminados() {
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = getDb();
                 String script = "SELECT * FROM VIEW_CARREGAR_COMERCIAL_DET WHERE (QtdePlayer is null OR QtdePlayer > Qtde)";
-                cursor = db.rawQuery(script, new String[]{});
-
-                if (cursor.getCount() > 0) {
-                    while (cursor.moveToNext()) {
+                Cursor cursorDet = db.rawQuery(script, new String[]{});
+                cursorDet.moveToFirst();
+                if (cursorDet.getCount() > 0) {
+                    while (cursorDet.moveToNext()) {
                         try {
                             ComercialDet comercialDet = new ComercialDet();
-                            comercialDet.arquivo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Arquivo")));
-                            comercialDet.cliente = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Cliente")));
-                            comercialDet.titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                            comercialDet.categoria = cursor.getString(cursor.getColumnIndex("Categoria"));
-                            comercialDet.dataInicial = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("PeriodoInicial")));
-                            comercialDet.dataFinal = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("PeriodoFinal")));
-                            comercialDet.horario1 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario1")));
-                            comercialDet.horario2 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario2")));
-                            comercialDet.horario3 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario3")));
-                            comercialDet.horario4 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario4")));
-                            comercialDet.horario5 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario5")));
-                            comercialDet.horario6 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario6")));
-                            comercialDet.horario7 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario7")));
-                            comercialDet.horario8 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario8")));
-                            comercialDet.horario9 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario9")));
-                            comercialDet.horario10 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario10")));
-                            comercialDet.horario11 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario11")));
-                            comercialDet.horario12 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario12")));
-                            comercialDet.horario13 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario13")));
-                            comercialDet.horario14 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario14")));
-                            comercialDet.horario15 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario15")));
-                            comercialDet.horario16 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario16")));
-                            comercialDet.horario17 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario17")));
-                            comercialDet.horario18 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario18")));
-                            comercialDet.horario19 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario19")));
-                            comercialDet.horario20 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario20")));
-                            comercialDet.horario21 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario21")));
-                            comercialDet.horario22 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario22")));
-                            comercialDet.horario23 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario23")));
-                            comercialDet.horario24 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Horario24")));
-                            comercialDet.semana1 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana1")));
-                            comercialDet.semana2 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
-                            comercialDet.semana3 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana2")));
-                            comercialDet.semana4 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana4")));
-                            comercialDet.semana5 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana5")));
-                            comercialDet.semana6 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana6")));
-                            comercialDet.semana7 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana7")));
-                            comercialDet.semana8 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana8")));
-                            comercialDet.semana9 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana9")));
-                            comercialDet.semana10 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana10")));
-                            comercialDet.semana11 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana11")));
-                            comercialDet.semana12 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana12")));
-                            comercialDet.semana13 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana13")));
-                            comercialDet.semana14 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana14")));
-                            comercialDet.semana15 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana15")));
-                            comercialDet.semana16 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana16")));
-                            comercialDet.semana17 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana17")));
-                            comercialDet.semana18 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana18")));
-                            comercialDet.semana19 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana19")));
-                            comercialDet.semana20 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana20")));
-                            comercialDet.semana21 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana21")));
-                            comercialDet.semana22 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana22")));
-                            comercialDet.semana23 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana23")));
-                            comercialDet.semana24 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Semana24")));
-                            comercialDet.diaSemana = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("DiaSemana")));
-                            comercialDet.diasAlternados = (cursor.getString(cursor.getColumnIndex("DiasAlternados")) == "1") ? true : false;
-                            comercialDet.data = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Data")));
-                            comercialDet.ultimaExecucao = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("UltimaExecucao")));
-                            comercialDet.tempoTotal = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("TempoTotal")));
-                            comercialDet.random = cursor.getInt(cursor.getColumnIndex("Random"));
-                            comercialDet.qtdePlayer = cursor.getInt(cursor.getColumnIndex("QtdePlayer"));
-                            comercialDet.qtdePlayer = cursor.getInt(cursor.getColumnIndex("Qtde"));
-                            comercialDet.dataVencimento = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
-                            comercialDet.dependencia1 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia1")));
-                            comercialDet.dependencia2 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia2")));
-                            comercialDet.dependencia3 = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Dependencia3")));
+                            comercialDet.arquivo = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Arquivo")));
+                            comercialDet.cliente = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Cliente")));
+                            comercialDet.titulo = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Titulo")));
+                            comercialDet.categoria = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Categoria")));
+                            comercialDet.dataInicial = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("PeriodoInicial")));
+                            comercialDet.dataFinal = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("PeriodoFinal")));
+                            comercialDet.horario1 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario1")));
+                            comercialDet.horario2 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario2")));
+                            comercialDet.horario3 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario3")));
+                            comercialDet.horario4 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario4")));
+                            comercialDet.horario5 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario5")));
+                            comercialDet.horario6 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario6")));
+                            comercialDet.horario7 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario7")));
+                            comercialDet.horario8 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario8")));
+                            comercialDet.horario9 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario9")));
+                            comercialDet.horario10 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario10")));
+                            comercialDet.horario11 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario11")));
+                            comercialDet.horario12 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario12")));
+                            comercialDet.horario13 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario13")));
+                            comercialDet.horario14 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario14")));
+                            comercialDet.horario15 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario15")));
+                            comercialDet.horario16 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario16")));
+                            comercialDet.horario17 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario17")));
+                            comercialDet.horario18 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario18")));
+                            comercialDet.horario19 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario19")));
+                            comercialDet.horario20 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario20")));
+                            comercialDet.horario21 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario21")));
+                            comercialDet.horario22 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario22")));
+                            comercialDet.horario23 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario23")));
+                            comercialDet.horario24 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Horario24")));
+                            comercialDet.semana1 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana1")));
+                            comercialDet.semana2 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana2")));
+                            comercialDet.semana3 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana2")));
+                            comercialDet.semana4 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana4")));
+                            comercialDet.semana5 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana5")));
+                            comercialDet.semana6 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana6")));
+                            comercialDet.semana7 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana7")));
+                            comercialDet.semana8 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana8")));
+                            comercialDet.semana9 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana9")));
+                            comercialDet.semana10 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana10")));
+                            comercialDet.semana11 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana11")));
+                            comercialDet.semana12 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana12")));
+                            comercialDet.semana13 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana13")));
+                            comercialDet.semana14 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana14")));
+                            comercialDet.semana15 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana15")));
+                            comercialDet.semana16 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana16")));
+                            comercialDet.semana17 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana17")));
+                            comercialDet.semana18 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana18")));
+                            comercialDet.semana19 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana19")));
+                            comercialDet.semana20 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana20")));
+                            comercialDet.semana21 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana21")));
+                            comercialDet.semana22 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana22")));
+                            comercialDet.semana23 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana23")));
+                            comercialDet.semana24 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Semana24")));
+                            comercialDet.diaSemana = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("DiaSemana")));
+                            comercialDet.diasAlternados = (cursorDet.getString(cursorDet.getColumnIndex("DiasAlternados")) == "1") ? true : false;
+                            comercialDet.data = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Data")));
+                            comercialDet.ultimaExecucao = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("UltimaExecucao")));
+                            comercialDet.tempoTotal = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("TempoTotal")));
+                            comercialDet.random = cursorDet.getInt(cursorDet.getColumnIndex("Random"));
+                            comercialDet.qtdePlayer = cursorDet.getInt(cursorDet.getColumnIndex("QtdePlayer"));
+                            comercialDet.qtdePlayer = cursorDet.getInt(cursorDet.getColumnIndex("Qtde"));
+                            comercialDet.dataVencimento = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("DataVencto")));
+                            comercialDet.dependencia1 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Dependencia1")));
+                            comercialDet.dependencia2 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Dependencia2")));
+                            comercialDet.dependencia3 = StringUtils.nuloParaVazio(cursorDet.getString(cursorDet.getColumnIndex("Dependencia3")));
                             listaComercialDeterminados.add(comercialDet);
                         } catch (SQLiteCantOpenDatabaseException e) {
                             AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
@@ -793,6 +783,7 @@ public class BancoDAO {
                         }
                     }
                 }
+                cursorDet.close();
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
@@ -804,12 +795,11 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : comerciaisDeterminados()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : comerciaisDeterminados()");
         }
     }
 
-    public void controladorComercialDependencia() {
+    public static void controladorComercialDependencia() {
         if (null != listaComercialDeterminados && listaComercialDeterminados.size() > 0 && !listaComercialDeterminados.isEmpty()) {
             for (ComercialDet comercialDet : listaComercialDeterminados) {
                 ComercialDet comercialDetComDepencias = dependenciaDeterminados(comercialDet);
@@ -846,7 +836,7 @@ public class BancoDAO {
 
     }
 
-    private ComercialDet dependenciaDeterminados(ComercialDet comercialDet) {
+    private static ComercialDet dependenciaDeterminados(ComercialDet comercialDet) {
         String nomeComercial = comercialDet.arquivo;
         String dependencia1 = comercialDet.dependencia1;
         String dependencia2 = comercialDet.dependencia2;
@@ -865,10 +855,10 @@ public class BancoDAO {
                             resultadoExisteNoBanco.arquivo = resultadoDependencia1;
                             comercialDet.listaDependencias.add(resultadoExisteNoBanco);
                         } else {
-                            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A Dependência " + dependencia1 + " do arquivo " + nomeComercial + " não foi encontrada no banco");
+                            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A Dependência " + dependencia1 + " do arquivo " + nomeComercial + " não foi encontrada no banco");
                         }
                     } else {
-                        LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A Dependência " + dependencia1 + " do arquivo " + nomeComercial + " não foi encontrada em nenhum diretório");
+                        LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A Dependência " + dependencia1 + " do arquivo " + nomeComercial + " não foi encontrada em nenhum diretório");
                     }
                 }
             } catch (NullPointerException e) {
@@ -891,10 +881,10 @@ public class BancoDAO {
                             resultadoExisteNoBanco.arquivo = resultadoDependencia2;
                             comercialDet.listaDependencias.add(resultadoExisteNoBanco);
                         } else {
-                            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A Dependência " + dependencia2 + " do arquivo " + nomeComercial + " não foi encontrada no banco");
+                            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A Dependência " + dependencia2 + " do arquivo " + nomeComercial + " não foi encontrada no banco");
                         }
                     } else {
-                        LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A Dependência " + dependencia2 + " do arquivo " + nomeComercial + " não foi encontrada em nenhum diretório");
+                        LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A Dependência " + dependencia2 + " do arquivo " + nomeComercial + " não foi encontrada em nenhum diretório");
                     }
                 }
             } catch (NullPointerException e) {
@@ -917,10 +907,10 @@ public class BancoDAO {
                             resultadoExisteNoBanco.arquivo = resultadoDependencia3;
                             comercialDet.listaDependencias.add(resultadoExisteNoBanco);
                         } else {
-                            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A Dependência " + dependencia3 + " do arquivo " + nomeComercial + " não foi encontrada no banco");
+                            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A Dependência " + dependencia3 + " do arquivo " + nomeComercial + " não foi encontrada no banco");
                         }
                     } else {
-                        LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. A Dependência " + dependencia3 + " do arquivo " + nomeComercial + " não foi encontrada em nenhum diretório");
+                        LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. A Dependência " + dependencia3 + " do arquivo " + nomeComercial + " não foi encontrada em nenhum diretório");
                     }
                 }
             } catch (NullPointerException e) {
@@ -934,13 +924,13 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " Desprezada com tipo 99. O comercial " + nomeComercial + " não foi encontrado em nenhum diretório");
+            LogUtils.registrar(99, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 99 Desprezada com tipo 99. O comercial " + nomeComercial + " não foi encontrado em nenhum diretório");
             return null;
         }
         return comercialDet;
     }
 
-    private ComercialDependencia validarDependenciaDeUmDeterminadoNoBanco(String nome) {
+    private static ComercialDependencia validarDependenciaDeUmDeterminadoNoBanco(String nome) {
         if (arquivoBanco.exists()) {
             try {
                 if (null != nome && !nome.replaceAll("\\s", "").trim().isEmpty()) {
@@ -992,6 +982,7 @@ public class BancoDAO {
                         cursorDependencia.close();
                         return comercialDependencia;
                     }
+                    cursorDependencia.close();
                 }
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
@@ -1007,13 +998,12 @@ public class BancoDAO {
                 return null;
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : validarDependenciaDeUmDeterminadoNoBanco()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : validarDependenciaDeUmDeterminadoNoBanco()");
         }
         return null;
     }
 
-    private void semanaAndHorario(String semana, String horario, String arquivo, String titulo, String categoria, List<ComercialDependencia> listaDependenciasComercialDeterminado, String dataUltimaExecucao) {
+    private static void semanaAndHorario(String semana, String horario, String arquivo, String titulo, String categoria, List<ComercialDependencia> listaDependenciasComercialDeterminado, String dataUltimaExecucao) {
         if (!semana.equals("") && !horario.equals("")) {
             if (dataUltimaExecucao.isEmpty() || dataUltimaExecucao.replaceAll("\\s", "").trim().equals("")) {
                 popularListaDeLinhasPlaylistDet(listaDependenciasComercialDeterminado, horario, semana, arquivo, titulo, categoria);
@@ -1090,7 +1080,7 @@ public class BancoDAO {
         }
     }
 
-    private void popularListaDeLinhasPlaylistDet(List<ComercialDependencia> listaDependenciasComercialDeterminado, String horario, String semana, String arquivo, String titulo, String categoria) {
+    private static void popularListaDeLinhasPlaylistDet(List<ComercialDependencia> listaDependenciasComercialDeterminado, String horario, String semana, String arquivo, String titulo, String categoria) {
         try {
             if (("" + semana.charAt(DataUtils.diaDaSemana())).trim().toLowerCase().equals("n") || ("" + semana.charAt(DataUtils.diaDaSemana())).trim().toLowerCase().contains("n")) {
                 semana = "0";
@@ -1156,7 +1146,7 @@ public class BancoDAO {
         }
     }
 
-    public void criarPlaylistDeterminados() {
+    public static void criarPlaylistDeterminados() {
         File playlistAntiga = new File(caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioPlaylist()).concat(barraDoSistema).concat("playlistDet.exp"));
         if (playlistAntiga.exists()) {
             playlistAntiga.delete();
@@ -1272,7 +1262,7 @@ public class BancoDAO {
     }
 
     //---------------------METODOS GENERICOS---------------------------//
-    private String validarExistenciaDoVideo(String nomeDoArquivo) {
+    private static String validarExistenciaDoVideo(String nomeDoArquivo) {
         try {
             File video = null;
             if (new File(caminho.concat(barraDoSistema).concat(ConfiguaracaoUtils.diretorio.getDiretorioVideo()).concat(barraDoSistema).concat(nomeDoArquivo)).exists()) {
@@ -1302,20 +1292,19 @@ public class BancoDAO {
         }
     }
 
-    public void excluirComercialDoBanco() {
+    public static void excluirComercialDoBanco() {
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = getDb();
                 String script = "SELECT * FROM Comercial WHERE DataVencto <= date('now')";
-                cursor = db.rawQuery(script, new String[]{});
+                Cursor cursorExcluirComercialDoBanco = db.rawQuery(script, new String[]{});
 
-                if (cursor.getCount() > 0) {
-                    while (cursor.moveToNext()) {
+                if (cursorExcluirComercialDoBanco.getCount() > 0) {
+                    while (cursorExcluirComercialDoBanco.moveToNext()) {
                         try {
-
-                            String arquivo = cursor.getString(cursor.getColumnIndex("Arquivo"));
-                            String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                            String dataVencto = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
+                            String arquivo = cursorExcluirComercialDoBanco.getString(cursorExcluirComercialDoBanco.getColumnIndex("Arquivo"));
+                            String titulo = StringUtils.nuloParaVazio(cursorExcluirComercialDoBanco.getString(cursorExcluirComercialDoBanco.getColumnIndex("Titulo")));
+                            String dataVencto = StringUtils.nuloParaVazio(cursorExcluirComercialDoBanco.getString(cursorExcluirComercialDoBanco.getColumnIndex("DataVencto")));
                             String resuldado = validarExistenciaDoVideo(arquivo);
                             if (resuldado != null) {
                                 File file = new File(resuldado);
@@ -1354,6 +1343,7 @@ public class BancoDAO {
                         }
                     }
                 }
+
             } catch (NullPointerException e) {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
@@ -1365,23 +1355,22 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : excluirComercialDoBanco()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : excluirComercialDoBanco()");
         }
     }
 
-    public void excluirVideosDoBanco() {
+    public static void excluirVideosDoBanco() {
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = getDb();
                 String script = "SELECT * FROM Video WHERE DataVencto <= date('now')";
-                cursor = db.rawQuery(script, new String[]{});
-                if (cursor.getCount() > 0) {
-                    while (cursor.moveToNext()) {
+                Cursor cursorExcluirVideosDoBanco = db.rawQuery(script, new String[]{});
+                if (cursorExcluirVideosDoBanco.getCount() > 0) {
+                    while (cursorExcluirVideosDoBanco.moveToNext()) {
                         try {
-                            String arquivo = cursor.getString(cursor.getColumnIndex("Arquivo"));
-                            String titulo = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("Titulo")));
-                            String dataVencto = StringUtils.nuloParaVazio(cursor.getString(cursor.getColumnIndex("DataVencto")));
+                            String arquivo = cursorExcluirVideosDoBanco.getString(cursorExcluirVideosDoBanco.getColumnIndex("Arquivo"));
+                            String titulo = StringUtils.nuloParaVazio(cursorExcluirVideosDoBanco.getString(cursorExcluirVideosDoBanco.getColumnIndex("Titulo")));
+                            String dataVencto = StringUtils.nuloParaVazio(cursorExcluirVideosDoBanco.getString(cursorExcluirVideosDoBanco.getColumnIndex("DataVencto")));
                             String resuldado = validarExistenciaDoVideo(arquivo);
 
                             if (resuldado != null) {
@@ -1432,16 +1421,15 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : excluirVideosDoBanco()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : excluirVideosDoBanco()");
         }
     }
 
     //------- CRIAR AS VIEW ---////
-    public void criarViewProgramacao() {
+    public static void criarViewProgramacao() {
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = getDb();
                 banco.criarViewProgramacao();
                 db.execSQL(banco.scriptProgramacaoView);
             } catch (SQLiteCantOpenDatabaseException e) {
@@ -1467,15 +1455,14 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : criarViewProgramacao()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : criarViewProgramacao()");
         }
     }
 
-    public void criarViewComercial() {
+    public static void criarViewComercial() {
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = getDb();
                 banco.criarViewComercial();
                 db.execSQL(banco.scriptComercialView);
             } catch (SQLiteCantOpenDatabaseException e) {
@@ -1501,15 +1488,14 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : criarViewComercial()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : criarViewComercial()");
         }
     }
 
-    public void criarViewComercialDetermidos() {
+    public static void criarViewComercialDetermidos() {
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = getDb();
                 banco.criarViewComercialDet();
                 db.execSQL(banco.scriptComercialDetView);
             } catch (SQLiteCantOpenDatabaseException e) {
@@ -1535,15 +1521,14 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : criarViewComercialDeterminado()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : criarViewComercialDeterminado()");
         }
     }
 
-    public void criarViewVideo() {
+    public static void criarViewVideo() {
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
+                SQLiteDatabase db = getDb();
                 banco.criarViewVideo();
                 db.execSQL(banco.scriptVideoView);
             } catch (SQLiteCantOpenDatabaseException e) {
@@ -1569,19 +1554,18 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : criarViewVideo()");
             LogUtils.registrar(21, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 21 Banco não foi encontrado : criarViewVideo()");
         }
     }
 
     //---- QUANTIDADE DE COMERCIAIS E VIDEOS NO BANCO ----------------------------------------------------------------------------------///
-    public String quantidadeComerciaisNoBanco() {
+    public static String quantidadeComerciaisNoBanco() {
         String comerciaisNoBanco = "";
         if (arquivoBanco.exists()) {
             try {
-                SQLiteDatabase db = helper.getWritableDatabase();
-                cursor = db.rawQuery("SELECT Arquivo FROM Comercial", new String[]{});
-                comerciaisNoBanco = String.valueOf(cursor.getCount());
+                SQLiteDatabase db = getDb();
+                Cursor cursorQuantidadeComerciaisNoBanco = db.rawQuery("SELECT Arquivo FROM Comercial", new String[]{});
+                comerciaisNoBanco = String.valueOf(cursorQuantidadeComerciaisNoBanco.getCount());
             } catch (SQLiteCantOpenDatabaseException e) {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                 return comerciaisNoBanco;
@@ -1606,18 +1590,17 @@ public class BancoDAO {
             }
             return comerciaisNoBanco;
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : quantidadeComerciaisNoBanco()");
             return comerciaisNoBanco;
         }
     }
 
-    public String quantidadeVideoNoBanco() {
+    public static String quantidadeVideoNoBanco() {
         String videoNoBanco = "";
         if (arquivoBanco.exists()) {
             try {
                 SQLiteDatabase db = getDb();
-                cursor = db.rawQuery("SELECT Arquivo FROM Video", new String[]{});
-                videoNoBanco = String.valueOf(cursor.getCount());
+                Cursor cursorQuantidadeComerciaisNoBanco = db.rawQuery("SELECT Arquivo FROM Video", new String[]{});
+                videoNoBanco = String.valueOf(cursorQuantidadeComerciaisNoBanco.getCount());
             } catch (SQLiteCantOpenDatabaseException e) {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                 return videoNoBanco;
@@ -1640,10 +1623,8 @@ public class BancoDAO {
                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                 return videoNoBanco;
             }
-
             return videoNoBanco;
         } else {
-            RegistrarLog.imprimirMsg("Log", " Banco não foi encontrado : quantidadeVideoNoBanco()");
             return videoNoBanco;
         }
     }
@@ -1664,9 +1645,9 @@ public class BancoDAO {
 
                 String sql = "";
                 if (tipoCategoria.equals("1")) {
-                    sql = "UPDATE Video SET Data ='" + data + "', UltimaExecucao = '" + ultimaExecucao + "', TempoTotal = '" + duracaoDoVideo + "', Random = " + valorRandom + ", Qtde = " + quantidadePlayer + " WHERE Arquivo = '" + video.getName().trim() + "'";
+                    sql = "UPDATE Video SET Data ='" + data + "', UltimaExecucao = '" + ultimaExecucao + "', TempoTotal = '" + duracaoDoVideo + "', Random = " + valorRandom + ", QtdePlayer = " + quantidadePlayer + " WHERE Arquivo = '" + video.getName().trim() + "'";
                 } else {
-                    sql = "UPDATE Comercial SET Data ='" + data + "', UltimaExecucao = '" + ultimaExecucao + "', TempoTotal = '" + duracaoDoVideo + "', Random = " + valorRandom + ", Qtde = " + quantidadePlayer + " WHERE Arquivo = '" + video.getName().trim() + "'";
+                    sql = "UPDATE Comercial SET Data ='" + data + "', UltimaExecucao = '" + ultimaExecucao + "', TempoTotal = '" + duracaoDoVideo + "', Random = " + valorRandom + ", QtdePlayer = " + quantidadePlayer + " WHERE Arquivo = '" + video.getName().trim() + "'";
                 }
                 db.execSQL(sql);
             } catch (SQLiteCantOpenDatabaseException e) {
@@ -1713,10 +1694,10 @@ public class BancoDAO {
                 cursor = db.rawQuery(sql, new String[]{});
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
-                    if (null == cursor.getString(cursor.getColumnIndex("Qtde"))) {
+                    if (null == cursor.getString(cursor.getColumnIndex("QtdePlayer"))) {
                         quantidade = 1;
                     } else {
-                        quantidade = cursor.getInt(cursor.getColumnIndex("Qtde")) + 1;
+                        quantidade = cursor.getInt(cursor.getColumnIndex("QtdePlayer")) + 1;
                     }
                 }
             } catch (SQLiteCantOpenDatabaseException e) {
@@ -1823,7 +1804,7 @@ public class BancoDAO {
     }
 
     //---------------------------POPULAR O BANCO APOS COMUNICACAO ---------------------------------------------------------------------//
-    public void insertCategoria(String caminho) {
+    public static boolean insertCategoria(String caminho) {
         if (arquivoBanco.exists()) {
             db = helper.getWritableDatabase();
             db.beginTransaction();
@@ -1872,30 +1853,36 @@ public class BancoDAO {
                             }
                         }
                         db.setTransactionSuccessful();
+                    } else {
+                        return false;
                     }
                 } catch (NullPointerException e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } catch (InvalidParameterException e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } catch (Exception e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } finally {
                     db.endTransaction();
                 }
+                return true;
+
+            } else {
+                return false;
             }
         } else {
-            RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : insertCategoria()");
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Banco não foi encontrado : insertCategoria()");
+            return false;
         }
     }
 
-    public void insertComercial(String caminho) {
+    public static boolean insertComercial(String caminho) {
         if (arquivoBanco.exists()) {
             db = helper.getWritableDatabase();
             db.beginTransaction();
@@ -1913,7 +1900,67 @@ public class BancoDAO {
                                 values.put("Categoria", c.categoria);
                                 values.put("PeriodoInicial", c.dataInicial);
                                 values.put("PeriodoFinal", c.dataFinal);
+                                values.put("Semana1", c.semana1);
+                                values.put("Horario1", c.horario1);
+                                values.put("Semana2", c.semana2);
+                                values.put("Horario2", c.horario2);
+                                values.put("Semana3", c.semana3);
+                                values.put("Horario3", c.horario3);
+                                values.put("Semana4", c.semana4);
+                                values.put("Horario4", c.horario4);
+                                values.put("Semana5", c.semana5);
+                                values.put("Horario5", c.horario5);
+                                values.put("Semana6", c.semana6);
+                                values.put("Horario6", c.horario6);
+                                values.put("Semana7", c.semana7);
+                                values.put("Horario7", c.horario7);
+                                values.put("Semana8", c.semana8);
+                                values.put("Horario8", c.horario8);
+                                values.put("Semana9", c.semana9);
+                                values.put("Horario9", c.horario9);
+                                values.put("Semana10", c.semana10);
+                                values.put("Horario10", c.horario10);
+                                values.put("Semana11", c.semana11);
+                                values.put("Horario11", c.horario11);
+                                values.put("Semana12", c.semana12);
+                                values.put("Horario12", c.horario12);
+                                values.put("Semana13", c.semana13);
+                                values.put("Horario13", c.horario13);
+                                values.put("Semana14", c.semana14);
+                                values.put("Horario14", c.horario14);
+                                values.put("Semana15", c.semana15);
+                                values.put("Horario15", c.horario15);
+                                values.put("Semana16", c.semana16);
+                                values.put("Horario16", c.horario16);
+                                values.put("Semana17", c.semana17);
+                                values.put("Horario17", c.horario17);
+                                values.put("Semana18", c.semana18);
+                                values.put("Horario18", c.horario18);
+                                values.put("Semana19", c.semana19);
+                                values.put("Horario19", c.horario19);
+                                values.put("Semana20", c.semana20);
+                                values.put("Horario20", c.horario20);
+                                values.put("Semana21", c.semana21);
+                                values.put("Horario21", c.horario21);
+                                values.put("Semana22", c.semana22);
+                                values.put("Horario22", c.horario22);
+                                values.put("Semana23", c.semana23);
+                                values.put("Horario23", c.horario23);
+                                values.put("Semana24", c.semana24);
+                                values.put("Horario24", c.horario24);
+                                values.put("DiaSemana", c.diaSemana);
+                                values.put("DiasAlternados", c.diasAlternados);
+                                values.put("Data", c.data);
+                                values.put("UltimaExecucao", c.ultimaExecucao);
+                                values.put("TempoTotal", c.tempoTotal);
+                                values.put("Qtde", c.qtdePlayer);
+                                values.put("DataVencto", c.dataVencimento);
+                                values.put("Dependencia1", c.dependencia1);
+                                values.put("Dependencia2", c.dependencia2);
+                                values.put("Dependencia3", c.dependencia3);
+
                                 db.replace("Comercial", null, values);
+
                             } catch (SQLiteCantOpenDatabaseException e) {
                                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                                 AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
@@ -1945,30 +1992,36 @@ public class BancoDAO {
                             }
                         }
                         db.setTransactionSuccessful();
+                    } else {
+                        return false;
                     }
                 } catch (NullPointerException e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } catch (InvalidParameterException e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } catch (Exception e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } finally {
                     db.endTransaction();
                 }
+                return true;
+            } else {
+                return false;
             }
         } else {
             RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : insertComercial()");
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Banco não foi encontrado : insertComercial()");
+            return false;
         }
     }
 
-    public void insertProgramacao(String caminho) {
+    public static boolean insertProgramacao(String caminho) {
         if (arquivoBanco.exists()) {
             db = helper.getWritableDatabase();
             db.beginTransaction();
@@ -1980,12 +2033,12 @@ public class BancoDAO {
                             try {
                                 ContentValues values = new ContentValues();
                                 values.put("Descricao", p.descricao.trim());
-                                values.put("Dia", p.dataInicial.split("-")[0]);
-                                values.put("Mes", p.dataInicial.split("-")[1]);
-                                values.put("Ano", p.dataInicial.split("-")[2]);
-                                values.put("Diaf", p.dataFinal.split("-")[0]);
-                                values.put("Mesf", p.dataFinal.split("-")[1]);
-                                values.put("Anof", p.dataFinal.split("-")[2]);
+                                values.put("Dia", p.diaInicial);
+                                values.put("Mes", p.mesInicial);
+                                values.put("Ano", p.anoInicial);
+                                values.put("Diaf", p.diaFinal);
+                                values.put("Mesf", p.mesFinal);
+                                values.put("Anof", p.anoFinal);
                                 values.put("DiaSemana", p.diaDaSemana);
                                 values.put("HoraInicio", p.horarioInicio);
                                 values.put("HoraFinal", p.horarioFinal);
@@ -2047,30 +2100,36 @@ public class BancoDAO {
                             }
                         }
                         db.setTransactionSuccessful();
+                    } else {
+                        return false;
                     }
                 } catch (NullPointerException e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } catch (InvalidParameterException e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } catch (Exception e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } finally {
                     db.endTransaction();
                 }
+                return true;
+            } else {
+                return false;
             }
         } else {
             RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : insertProgramacao()");
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Banco não foi encontrado : insertProgramacao()");
+            return false;
         }
     }
 
-    public void insertVideo(String caminho) {
+    public static boolean insertVideo(String caminho) {
         if (arquivoBanco.exists()) {
             db = helper.getWritableDatabase();
             db.beginTransaction();
@@ -2102,7 +2161,7 @@ public class BancoDAO {
                                 values.put("Data", v.data);
                                 values.put("UltimaExecucaoData", v.ultimaExecucaoData);
                                 values.put("TempoTotal", v.tempoTotal);
-                                values.put("QtdePlayer", v.quantidadePlayerTotal);
+                                values.put("Qtde", v.quantidadePlayerTotal);
                                 values.put("DataVencto", v.dataVencimento);
                                 values.put("FrameInicio", v.frameInicio);
                                 values.put("FrameFinal", v.frameFinal);
@@ -2140,26 +2199,32 @@ public class BancoDAO {
                             }
                         }
                         db.setTransactionSuccessful();
+                    } else {
+                        return false;
                     }
                 } catch (NullPointerException e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } catch (InvalidParameterException e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } catch (Exception e) {
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e);
                     AndroidImprimirUtils.imprimirErro(BancoDAO.class, e, 90);
-                    return;
+                    return false;
                 } finally {
                     db.endTransaction();
                 }
+                return true;
+            } else {
+                return false;
             }
         } else {
             RegistrarLog.imprimirMsg("Log", "Banco não foi encontrado : insertVideo()");
             LogUtils.registrar(90, ConfiguaracaoUtils.diretorio.isLogCompleto(), " 90 Banco não foi encontrado : insertVideo()");
+            return false;
         }
     }
 }
